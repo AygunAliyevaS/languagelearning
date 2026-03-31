@@ -1,5 +1,5 @@
 # GitHub Actions workflow for deploying pro-chess to Azure Web App
-# Update AZURE_WEBAPP_NAME and AZURE_WEBAPP_PACKAGE_PATH as needed
+# Uses Azure CLI login with Service Principal (no publish profile needed)
 
 name: Azure Node.js Deploy
 
@@ -29,13 +29,23 @@ jobs:
       - name: Zip artifact for deployment
         run: zip -r release.zip .
 
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           package: release.zip
-          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
 
 # Required secrets:
-# - AZURE_WEBAPP_NAME: Name of your Azure Web App
-# - AZURE_WEBAPP_PUBLISH_PROFILE: Azure publish profile XML (from Azure Portal)
+# - AZURE_CLIENT_ID
+# - AZURE_TENANT_ID
+# - AZURE_SUBSCRIPTION_ID
+# - AZURE_CLIENT_SECRET
+# - AZURE_WEBAPP_NAME
