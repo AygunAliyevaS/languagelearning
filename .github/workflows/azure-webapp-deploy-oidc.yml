@@ -23,16 +23,13 @@ jobs:
 
 
       - name: Clean install (remove lock and modules)
-        working-directory: languagelearning-master
         run: |
           rm -rf node_modules package-lock.json
 
       - name: Install dependencies (legacy peer deps)
-        working-directory: languagelearning-master
         run: npm install --legacy-peer-deps
 
       - name: Build project
-        working-directory: languagelearning-master
         run: npm run build
 
       - name: 'Login to Azure using OIDC'

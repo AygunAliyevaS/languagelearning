@@ -6,7 +6,7 @@ import { authHandler, initAuthConfig } from '@hono/auth-js';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { hash, verify } from 'argon2';
 import { Hono } from 'hono';
-import { contextStorage, getContext } from 'hono/context-storage';
+import { contextStorage } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { proxy } from 'hono/proxy';
 import { bodyLimit } from 'hono/body-limit';
@@ -17,7 +17,7 @@ import ws from 'ws';
 import NeonAdapter from './adapter';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
-import { API_BASENAME, api } from './route-builder';
+import { API_BASENAME, api, routesReady } from './route-builder';
 neonConfig.webSocketConstructor = ws;
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
@@ -249,9 +249,13 @@ app.use('/api/auth/*', async (c, next) => {
   }
   return next();
 });
-app.route(API_BASENAME, api);
 
-export default await createHonoServer({
-  app,
-  defaultLogger: false,
-});
+export default (async () => {
+  await routesReady;
+  app.route(API_BASENAME, api);
+
+  return createHonoServer({
+    app,
+    defaultLogger: false,
+  });
+})();
