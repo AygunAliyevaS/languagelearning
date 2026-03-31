@@ -6,7 +6,7 @@ name: Azure Node.js Deploy
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   build-and-deploy:
@@ -18,16 +18,19 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18.x'
+          node-version: '22.x'
 
       - name: Install dependencies
         run: npm install
+        working-directory: languagelearning-master
 
       - name: Build app
         run: npm run build
+        working-directory: languagelearning-master
 
       - name: Zip artifact for deployment
         run: zip -r release.zip .
+        working-directory: languagelearning-master
 
       - name: Azure Login
         uses: azure/login@v2
@@ -41,7 +44,7 @@ jobs:
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          package: release.zip
+          package: languagelearning-master/release.zip
 
 # Required secrets:
 # - AZURE_CLIENT_ID
