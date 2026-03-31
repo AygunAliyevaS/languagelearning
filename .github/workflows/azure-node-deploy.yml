@@ -1,0 +1,41 @@
+# GitHub Actions workflow for deploying pro-chess to Azure Web App
+# Update AZURE_WEBAPP_NAME and AZURE_WEBAPP_PACKAGE_PATH as needed
+
+name: Azure Node.js Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build app
+        run: npm run build
+
+      - name: Zip artifact for deployment
+        run: zip -r release.zip .
+
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          package: release.zip
+          publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+
+# Required secrets:
+# - AZURE_WEBAPP_NAME: Name of your Azure Web App
+# - AZURE_WEBAPP_PUBLISH_PROFILE: Azure publish profile XML (from Azure Portal)
