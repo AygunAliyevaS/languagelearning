@@ -1,0 +1,10 @@
+.DS_Store
+/node_modules/
+/.env
+/.env.local
+/.vitest/
+/.vscode/
+
+# React Router
+/.react-router/
+/build/
