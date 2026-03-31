@@ -26,8 +26,11 @@ jobs:
       - name: Build app
         run: npm run build
 
+      - name: Install production dependencies only
+        run: npm ci --omit=dev
+
       - name: Zip artifact for deployment
-        run: zip -r release.zip . --exclude "*.git*" --exclude "node_modules/*"
+        run: zip -r release.zip build/ node_modules/ package.json package-lock.json
 
       - name: Azure Login
         uses: azure/login@v2
