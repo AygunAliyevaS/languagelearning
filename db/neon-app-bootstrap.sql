@@ -7,9 +7,13 @@ CREATE TABLE IF NOT EXISTS users (
   xp INTEGER NOT NULL DEFAULT 0,
   streak INTEGER NOT NULL DEFAULT 0,
   cefr_level TEXT NOT NULL DEFAULT 'A1',
+  preferred_language TEXT NOT NULL DEFAULT 'az',
   last_active TIMESTAMPTZ,
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+ALTER TABLE users
+ADD COLUMN IF NOT EXISTS preferred_language TEXT NOT NULL DEFAULT 'az';
 
 CREATE TABLE IF NOT EXISTS lessons (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -92,7 +96,7 @@ CREATE TABLE IF NOT EXISTS user_purchases (
   created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-INSERT INTO users (id, username, email, xp, streak, cefr_level, last_active)
+INSERT INTO users (id, username, email, xp, streak, cefr_level, preferred_language, last_active)
 VALUES (
   '11111111-1111-1111-1111-111111111111',
   'learner.demo',
@@ -100,6 +104,7 @@ VALUES (
   1280,
   7,
   'B1',
+  'az',
   CURRENT_TIMESTAMP
 )
 ON CONFLICT (email) DO UPDATE SET
@@ -107,6 +112,7 @@ ON CONFLICT (email) DO UPDATE SET
   xp = EXCLUDED.xp,
   streak = EXCLUDED.streak,
   cefr_level = EXCLUDED.cefr_level,
+  preferred_language = EXCLUDED.preferred_language,
   last_active = EXCLUDED.last_active;
 
 INSERT INTO lessons (id, level_code, order_index, title, description, slug, duration_minutes)

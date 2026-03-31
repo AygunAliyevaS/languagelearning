@@ -1,10 +1,12 @@
 import { Link, useLoaderData } from 'react-router';
+import { useI18n, useLocalizedDocument } from '@/lib/language-context';
+import { DEFAULT_LANGUAGE, getTranslation } from '@/lib/languages';
 import { fetchApiJson, fetchDemoUser } from '../lib/api-loader';
 
 export const meta = () => {
   return [
-    { title: 'Progress' },
-    { name: 'description', content: 'Track learner profile, entitlements, and upgrade recommendations.' },
+    { title: getTranslation(DEFAULT_LANGUAGE, 'progressPage.metaTitle') },
+    { name: 'description', content: getTranslation(DEFAULT_LANGUAGE, 'progressPage.metaDescription') },
   ];
 };
 
@@ -34,9 +36,10 @@ export async function loader({ request }) {
 }
 
 export default function ProgressPage() {
+  const { t } = useI18n();
   const loaderData = useLoaderData() ?? {
     learner: null,
-    learnerError: 'Live loader data is temporarily unavailable in this render path.',
+    learnerError: t('common.loaderUnavailable'),
     subscription: null,
     subscriptionError: null,
     recommendations: [],
@@ -53,55 +56,57 @@ export default function ProgressPage() {
     plans,
   } = loaderData;
 
+  useLocalizedDocument(t('progressPage.metaTitle'), t('progressPage.metaDescription'));
+
   return (
     <main className="min-h-screen bg-white text-slate-900">
       <section className="mx-auto flex max-w-6xl flex-col gap-8 px-6 py-12">
         <div className="space-y-3">
-          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">Progress</p>
-          <h1 className="text-4xl font-semibold tracking-tight text-slate-950">Learner profile and access</h1>
+          <p className="text-sm font-semibold uppercase tracking-[0.2em] text-slate-500">{t('progressPage.eyebrow')}</p>
+          <h1 className="text-4xl font-semibold tracking-tight text-slate-950">{t('progressPage.title')}</h1>
           <p className="max-w-3xl text-base leading-7 text-slate-600">
-            This route reads from `/api/user`, `/api/subscriptions`, and pricing recommendation endpoints.
+            {t('progressPage.subtitle')}
           </p>
         </div>
 
         {learnerError || subscriptionError || recommendationsError ? (
           <div className="rounded-3xl border border-amber-200 bg-amber-50 p-6 text-amber-950">
-            <h2 className="text-xl font-semibold">Progress data is partially unavailable</h2>
+            <h2 className="text-xl font-semibold">{t('progressPage.dataUnavailable')}</h2>
             <p className="mt-2 text-sm leading-6">{learnerError || subscriptionError || recommendationsError}</p>
           </div>
         ) : null}
 
         <div className="grid gap-4 md:grid-cols-4">
-          <MetricCard label="CEFR level" value={learner?.cefr_level || 'n/a'} />
-          <MetricCard label="XP" value={learner?.xp ?? 'n/a'} />
-          <MetricCard label="Streak" value={learner?.streak ?? 'n/a'} />
-          <MetricCard label="Plan" value={subscription?.subscription?.planName || subscription?.planId || 'Free'} />
+          <MetricCard label={t('progressPage.cefrLevel')} value={learner?.cefr_level || 'n/a'} />
+          <MetricCard label={t('progressPage.xp')} value={learner?.xp ?? 'n/a'} />
+          <MetricCard label={t('progressPage.streak')} value={learner?.streak ?? 'n/a'} />
+          <MetricCard label={t('progressPage.plan')} value={subscription?.subscription?.planName || subscription?.planId || t('common.free')} />
         </div>
 
         <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
           <section className="rounded-3xl border border-slate-200 bg-slate-50 p-6">
-            <h2 className="text-2xl font-semibold text-slate-950">Current entitlements</h2>
+            <h2 className="text-2xl font-semibold text-slate-950">{t('progressPage.currentEntitlements')}</h2>
             <div className="mt-4 grid gap-3">
-              <EntitlementRow label="Access level" value={subscription?.accessLevel || 'free'} />
-              <EntitlementRow label="Offline mode" value={subscription?.features?.offlineMode ? 'Enabled' : 'Locked'} />
-              <EntitlementRow label="AI personalization" value={subscription?.features?.aiPersonalization ? 'Enabled' : 'Locked'} />
-              <EntitlementRow label="Speech recognition" value={subscription?.features?.speechRecognition ? 'Enabled' : 'Locked'} />
-              <EntitlementRow label="Storage" value={subscription?.limits?.storageMB ? `${subscription.limits.storageMB} MB` : 'n/a'} />
-              <EntitlementRow label="AI credits" value={subscription?.limits?.aiCredits ?? 0} />
+              <EntitlementRow label={t('progressPage.accessLevel')} value={subscription?.accessLevel || t('common.free')} />
+              <EntitlementRow label={t('progressPage.offlineMode')} value={subscription?.features?.offlineMode ? t('common.enabled') : t('common.locked')} />
+              <EntitlementRow label={t('progressPage.aiPersonalization')} value={subscription?.features?.aiPersonalization ? t('common.enabled') : t('common.locked')} />
+              <EntitlementRow label={t('progressPage.speechRecognition')} value={subscription?.features?.speechRecognition ? t('common.enabled') : t('common.locked')} />
+              <EntitlementRow label={t('progressPage.storage')} value={subscription?.limits?.storageMB ? t('progressPage.storageAmount', { amount: subscription.limits.storageMB }) : 'n/a'} />
+              <EntitlementRow label={t('progressPage.aiCredits')} value={subscription?.limits?.aiCredits ?? 0} />
             </div>
           </section>
 
           <section className="rounded-3xl border border-slate-200 bg-white p-6 shadow-[0_18px_40px_rgba(15,23,42,0.06)]">
             <div className="flex items-center justify-between gap-4">
-              <h2 className="text-2xl font-semibold text-slate-950">Upgrade recommendations</h2>
-              <Link to="/practice" className="text-sm font-semibold text-slate-700">Practice queue</Link>
+              <h2 className="text-2xl font-semibold text-slate-950">{t('progressPage.upgradeRecommendations')}</h2>
+              <Link to="/practice" className="text-sm font-semibold text-slate-700">{t('progressPage.practiceQueue')}</Link>
             </div>
             <div className="mt-4 space-y-4">
               {recommendations.length > 0 ? (
                 recommendations.map((recommendation, index) => (
                   <article key={`${recommendation.targetPlan}-${index}`} className="rounded-2xl border border-slate-200 bg-slate-50 p-4">
                     <div className="flex items-center justify-between gap-4">
-                      <h3 className="font-semibold text-slate-950">Upgrade to {recommendation.targetPlan}</h3>
+                      <h3 className="font-semibold text-slate-950">{t('progressPage.upgradeTo', { plan: recommendation.targetPlan })}</h3>
                       <span className="rounded-full bg-slate-950 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-white">
                         {recommendation.urgency}
                       </span>
@@ -111,7 +116,7 @@ export default function ProgressPage() {
                 ))
               ) : (
                 <p className="text-sm leading-6 text-slate-600">
-                  No live recommendation records were returned. That usually means the learner profile is missing or there is not enough usage data yet.
+                  {t('progressPage.noRecommendations')}
                 </p>
               )}
             </div>
@@ -120,8 +125,8 @@ export default function ProgressPage() {
 
         <section className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-semibold text-slate-950">Available plans</h2>
-            <Link to="/lessons" className="text-sm font-semibold text-slate-700">Open lessons</Link>
+            <h2 className="text-2xl font-semibold text-slate-950">{t('progressPage.availablePlans')}</h2>
+            <Link to="/lessons" className="text-sm font-semibold text-slate-700">{t('progressPage.openLessons')}</Link>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
             {plans.map((plan) => (
@@ -130,7 +135,7 @@ export default function ProgressPage() {
                 <h3 className="mt-2 text-2xl font-semibold text-slate-950">{plan.name}</h3>
                 <p className="mt-3 text-3xl font-semibold text-slate-950">${plan.currentPrice}</p>
                 <p className="mt-3 text-sm leading-6 text-slate-600">
-                  {Array.isArray(plan.features.lessons) ? `${plan.features.lessons.join('-')} curriculum access` : 'Live plan metadata from pricing API.'}
+                  {Array.isArray(plan.features.lessons) ? t('progressPage.curriculumAccess', { range: plan.features.lessons.join('-') }) : t('progressPage.livePlanMetadata')}
                 </p>
               </article>
             ))}
