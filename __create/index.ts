@@ -87,8 +87,12 @@ for (const method of ['post', 'put', 'patch'] as const) {
 if (process.env.AUTH_SECRET) {
   app.use(
     '*',
-    initAuthConfig((c) => ({
-      secret: c.env.AUTH_SECRET,
+    initAuthConfig(() => {
+      const isSecureAuth = process.env.AUTH_URL?.startsWith('https') ?? false;
+
+      return {
+      secret: process.env.AUTH_SECRET,
+      trustHost: true,
       pages: {
         signIn: '/account/signin',
         signOut: '/account/logout',
@@ -108,20 +112,20 @@ if (process.env.AUTH_SECRET) {
       cookies: {
         csrfToken: {
           options: {
-            secure: true,
-            sameSite: 'none',
+            secure: isSecureAuth,
+            sameSite: isSecureAuth ? 'none' : 'lax',
           },
         },
         sessionToken: {
           options: {
-            secure: true,
-            sameSite: 'none',
+            secure: isSecureAuth,
+            sameSite: isSecureAuth ? 'none' : 'lax',
           },
         },
         callbackUrl: {
           options: {
-            secure: true,
-            sameSite: 'none',
+            secure: isSecureAuth,
+            sameSite: isSecureAuth ? 'none' : 'lax',
           },
         },
       },
@@ -219,7 +223,8 @@ if (process.env.AUTH_SECRET) {
           },
         }),
       ],
-    }))
+    };
+    })
   );
 }
 app.all('/integrations/:path{.+}', async (c, next) => {

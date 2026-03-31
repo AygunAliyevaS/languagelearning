@@ -39,6 +39,13 @@ npm run start
 
 Create your local environment file from `.env.example` and provide the values required for your deployment target.
 
+For local development with the default Vite server port, use:
+
+```env
+AUTH_URL=http://localhost:4000/api/auth
+APP_URL=http://localhost:4000
+```
+
 Key runtime variables:
 
 - `AUTH_SECRET`
