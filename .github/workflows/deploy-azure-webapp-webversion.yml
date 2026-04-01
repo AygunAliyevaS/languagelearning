@@ -8,6 +8,7 @@ on:
 env:
   NODE_VERSION: '22.12.0'
   AZURE_WEBAPP_NAME: 'azeridili'
+  AZURE_RESOURCE_GROUP: 'azdili'
   AZURE_NODE_RUNTIME: 'NODE|22-lts'
   AZURE_STARTUP_COMMAND: 'npm start'
 
@@ -60,21 +61,6 @@ jobs:
         with:
           creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
 
-      - name: Resolve Azure Web App resource group
-        id: azure-webapp
-        shell: bash
-        run: |
-          resource_group=$(az webapp list \
-            --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup | [0]" \
-            --output tsv)
-
-          if [ -z "$resource_group" ]; then
-            echo "Unable to resolve resource group for web app '${{ env.AZURE_WEBAPP_NAME }}'." >&2
-            exit 1
-          fi
-
-          echo "resource-group=$resource_group" >> "$GITHUB_OUTPUT"
-
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
@@ -86,13 +72,13 @@ jobs:
         run: |
           az webapp config set \
             --name "${{ env.AZURE_WEBAPP_NAME }}" \
-            --resource-group "${{ steps.azure-webapp.outputs.resource-group }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
             --linux-fx-version "${{ env.AZURE_NODE_RUNTIME }}" \
             --startup-file "${{ env.AZURE_STARTUP_COMMAND }}"
 
           az webapp config appsettings set \
             --name "${{ env.AZURE_WEBAPP_NAME }}" \
-            --resource-group "${{ steps.azure-webapp.outputs.resource-group }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
             --settings \
               AUTH_URL="https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/auth" \
               HOST="0.0.0.0"
@@ -102,7 +88,7 @@ jobs:
         run: |
           app_command_line=$(az webapp config show \
             --name "${{ env.AZURE_WEBAPP_NAME }}" \
-            --resource-group "${{ steps.azure-webapp.outputs.resource-group }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
             --query appCommandLine \
             --output tsv)
 
@@ -116,7 +102,7 @@ jobs:
         run: |
           az webapp restart \
             --name "${{ env.AZURE_WEBAPP_NAME }}" \
-            --resource-group "${{ steps.azure-webapp.outputs.resource-group }}"
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}"
 
       - name: Verify live site is not placeholder
         shell: bash
