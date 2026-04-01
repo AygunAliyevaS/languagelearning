@@ -18,12 +18,10 @@ import NeonAdapter from './adapter';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
 import { API_BASENAME, api } from './route-builder';
+import { getAuthUrlFromRequest } from '@/utils/auth-url';
 neonConfig.webSocketConstructor = ws;
 
 const authSecret = process.env.AUTH_SECRET ?? (import.meta.env.DEV ? 'dev-auth-secret' : undefined);
-const authUrl = process.env.AUTH_URL ?? (import.meta.env.DEV ? 'http://localhost:4000' : undefined);
-const useSecureAuthCookies = authUrl?.startsWith('https') ?? false;
-const authCookieSameSite = useSecureAuthCookies ? 'none' : 'lax';
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
 
@@ -92,47 +90,52 @@ for (const method of ['post', 'put', 'patch'] as const) {
 if (authSecret) {
   app.use(
     '*',
-    initAuthConfig((c) => ({
-      secret: authSecret,
-      basePath: '/api/auth',
-      trustHost: true,
-      pages: {
-        signIn: '/account/signin',
-        signOut: '/account/logout',
-      },
-      skipCSRFCheck,
-      session: {
-        strategy: 'jwt',
-      },
-      callbacks: {
-        session({ session, token }) {
-          if (token.sub) {
-            session.user.id = token.sub;
-          }
-          return session;
+    initAuthConfig((c) => {
+      const authUrl = getAuthUrlFromRequest(c.req.raw);
+      const useSecureAuthCookies = authUrl.startsWith('https://');
+      const authCookieSameSite = useSecureAuthCookies ? 'none' : 'lax';
+
+      return {
+        secret: authSecret,
+        basePath: '/api/auth',
+        trustHost: true,
+        pages: {
+          signIn: '/account/signin',
+          signOut: '/account/logout',
         },
-      },
-      cookies: {
-        csrfToken: {
-          options: {
-            secure: useSecureAuthCookies,
-            sameSite: authCookieSameSite,
+        skipCSRFCheck,
+        session: {
+          strategy: 'jwt',
+        },
+        callbacks: {
+          session({ session, token }) {
+            if (token.sub) {
+              session.user.id = token.sub;
+            }
+            return session;
           },
         },
-        sessionToken: {
-          options: {
-            secure: useSecureAuthCookies,
-            sameSite: authCookieSameSite,
+        cookies: {
+          csrfToken: {
+            options: {
+              secure: useSecureAuthCookies,
+              sameSite: authCookieSameSite,
+            },
+          },
+          sessionToken: {
+            options: {
+              secure: useSecureAuthCookies,
+              sameSite: authCookieSameSite,
+            },
+          },
+          callbackUrl: {
+            options: {
+              secure: useSecureAuthCookies,
+              sameSite: authCookieSameSite,
+            },
           },
         },
-        callbackUrl: {
-          options: {
-            secure: useSecureAuthCookies,
-            sameSite: authCookieSameSite,
-          },
-        },
-      },
-      providers: [
+        providers: [
         Credentials({
           id: 'credentials-signin',
           name: 'Credentials Sign in',
@@ -224,8 +227,9 @@ if (authSecret) {
             return null;
           },
         }),
-      ],
-    }))
+        ],
+      };
+    })
   );
 }
 app.all('/integrations/:path{.+}', async (c, next) => {
