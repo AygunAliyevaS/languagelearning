@@ -7,6 +7,7 @@ on:
 
 env:
   NODE_VERSION: '22.12.0'
+  AZURE_WEBAPP_NAME: 'azeridili'
   AZURE_NODE_RUNTIME: 'NODE|22-lts'
   AZURE_STARTUP_COMMAND: 'npm start'
 
@@ -64,11 +65,11 @@ jobs:
         shell: bash
         run: |
           resource_group=$(az webapp list \
-            --query "[?name=='${{ secrets.AZURE_WEBAPP_NAME }}'].resourceGroup | [0]" \
+            --query "[?name=='${{ env.AZURE_WEBAPP_NAME }}'].resourceGroup | [0]" \
             --output tsv)
 
           if [ -z "$resource_group" ]; then
-            echo "Unable to resolve resource group for web app '${{ secrets.AZURE_WEBAPP_NAME }}'." >&2
+            echo "Unable to resolve resource group for web app '${{ env.AZURE_WEBAPP_NAME }}'." >&2
             exit 1
           fi
 
@@ -77,30 +78,30 @@ jobs:
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: ./release
 
       - name: Configure Azure Web App runtime
         shell: bash
         run: |
           az webapp config set \
-            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --name "${{ env.AZURE_WEBAPP_NAME }}" \
             --resource-group "${{ steps.azure-webapp.outputs.resource-group }}" \
             --linux-fx-version "${{ env.AZURE_NODE_RUNTIME }}" \
             --startup-file "${{ env.AZURE_STARTUP_COMMAND }}"
 
           az webapp config appsettings set \
-            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --name "${{ env.AZURE_WEBAPP_NAME }}" \
             --resource-group "${{ steps.azure-webapp.outputs.resource-group }}" \
             --settings \
-              AUTH_URL="https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/auth" \
+              AUTH_URL="https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/auth" \
               HOST="0.0.0.0"
 
       - name: Verify Azure startup command
         shell: bash
         run: |
           app_command_line=$(az webapp config show \
-            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --name "${{ env.AZURE_WEBAPP_NAME }}" \
             --resource-group "${{ steps.azure-webapp.outputs.resource-group }}" \
             --query appCommandLine \
             --output tsv)
@@ -114,13 +115,13 @@ jobs:
         shell: bash
         run: |
           az webapp restart \
-            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --name "${{ env.AZURE_WEBAPP_NAME }}" \
             --resource-group "${{ steps.azure-webapp.outputs.resource-group }}"
 
       - name: Verify live site is not placeholder
         shell: bash
         run: |
-          app_url="https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+          app_url="https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net"
 
           for attempt in 1 2 3 4 5 6; do
             response=$(curl --silent --show-error --location "$app_url")
