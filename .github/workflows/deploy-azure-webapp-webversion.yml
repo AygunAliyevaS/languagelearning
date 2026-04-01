@@ -18,6 +18,7 @@ jobs:
     environment: webversion
     permissions:
       contents: read
+      id-token: write
 
     if: github.ref == 'refs/heads/webversion'
 
@@ -59,7 +60,9 @@ jobs:
       - name: Azure login
         uses: azure/login@v3
         with:
-          creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+          client-id: ${{ secrets.AZURE_WEBVERSION_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_WEBVERSION_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_WEBVERSION_SUBSCRIPTION_ID }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
