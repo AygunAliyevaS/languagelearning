@@ -109,3 +109,29 @@ jobs:
             echo "Azure startup command mismatch. Expected '${{ env.AZURE_STARTUP_COMMAND }}' but got '$app_command_line'." >&2
             exit 1
           fi
+
+      - name: Restart Azure Web App
+        shell: bash
+        run: |
+          az webapp restart \
+            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --resource-group "${{ steps.azure-webapp.outputs.resource-group }}"
+
+      - name: Verify live site is not placeholder
+        shell: bash
+        run: |
+          app_url="https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net"
+
+          for attempt in 1 2 3 4 5 6; do
+            response=$(curl --silent --show-error --location "$app_url")
+
+            if [[ "$response" != *"Your web app is running and waiting for your content"* ]]; then
+              exit 0
+            fi
+
+            echo "Placeholder page still active on attempt $attempt. Waiting for restart to finish..."
+            sleep 20
+          done
+
+          echo "Azure app is still serving the placeholder page after deployment." >&2
+          exit 1
