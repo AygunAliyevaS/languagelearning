@@ -8,7 +8,7 @@ on:
 env:
   NODE_VERSION: '22.12.0'
   AZURE_NODE_RUNTIME: 'NODE|22-lts'
-  AZURE_STARTUP_COMMAND: 'node node_modules/@react-router/serve/dist/cli.js build/server/index.js'
+  AZURE_STARTUP_COMMAND: 'npm start'
 
 jobs:
   build-and-deploy:
@@ -74,6 +74,12 @@ jobs:
 
           echo "resource-group=$resource_group" >> "$GITHUB_OUTPUT"
 
+      - name: Deploy to Azure Web App
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          package: ./release
+
       - name: Configure Azure Web App runtime
         shell: bash
         run: |
@@ -90,9 +96,16 @@ jobs:
               AUTH_URL="https://${{ secrets.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/auth" \
               HOST="0.0.0.0"
 
-      - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
-          package: ./release
-          startup-command: ${{ env.AZURE_STARTUP_COMMAND }}
+      - name: Verify Azure startup command
+        shell: bash
+        run: |
+          app_command_line=$(az webapp config show \
+            --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+            --resource-group "${{ steps.azure-webapp.outputs.resource-group }}" \
+            --query appCommandLine \
+            --output tsv)
+
+          if [ "$app_command_line" != "${{ env.AZURE_STARTUP_COMMAND }}" ]; then
+            echo "Azure startup command mismatch. Expected '${{ env.AZURE_STARTUP_COMMAND }}' but got '$app_command_line'." >&2
+            exit 1
+          fi
