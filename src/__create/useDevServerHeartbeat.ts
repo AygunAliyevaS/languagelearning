@@ -1,9 +1,8 @@
-'use client';
-
 import { useIdleTimer } from 'react-idle-timer';
 
 export function useDevServerHeartbeat() {
   useIdleTimer({
+    disabled: typeof window === 'undefined',
     throttle: 60_000 * 3,
     timeout: 60_000,
     onAction: () => {

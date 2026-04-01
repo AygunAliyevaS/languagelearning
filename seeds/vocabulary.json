@@ -1,0 +1,170 @@
+[
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f001",
+		"word": "salam",
+		"translation": "hello",
+		"translation_translations": {
+			"az": "salam",
+			"en": "hello",
+			"es": "hola",
+			"ru": "здравствуйте",
+			"tr": "merhaba"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f002",
+		"word": "sağ ol",
+		"translation": "goodbye",
+		"translation_translations": {
+			"az": "sağ ol",
+			"en": "goodbye",
+			"es": "adiós",
+			"ru": "до свидания",
+			"tr": "güle güle"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f003",
+		"word": "ad",
+		"translation": "name",
+		"translation_translations": {
+			"az": "ad",
+			"en": "name",
+			"es": "nombre",
+			"ru": "имя",
+			"tr": "isim"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f004",
+		"word": "səhər",
+		"translation": "morning",
+		"translation_translations": {
+			"az": "səhər",
+			"en": "morning",
+			"es": "mañana",
+			"ru": "утро",
+			"tr": "sabah"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f005",
+		"word": "çay",
+		"translation": "tea",
+		"translation_translations": {
+			"az": "çay",
+			"en": "tea",
+			"es": "té",
+			"ru": "чай",
+			"tr": "çay"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f006",
+		"word": "öyrənmək",
+		"translation": "to study",
+		"translation_translations": {
+			"az": "öyrənmək",
+			"en": "to study",
+			"es": "estudiar",
+			"ru": "учиться",
+			"tr": "ögrenmek"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f007",
+		"word": "stansiya",
+		"translation": "station",
+		"translation_translations": {
+			"az": "stansiya",
+			"en": "station",
+			"es": "estación",
+			"ru": "станция",
+			"tr": "istasyon"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f008",
+		"word": "düz",
+		"translation": "straight",
+		"translation_translations": {
+			"az": "düz",
+			"en": "straight",
+			"es": "recto",
+			"ru": "прямо",
+			"tr": "düz"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f009",
+		"word": "sol",
+		"translation": "left",
+		"translation_translations": {
+			"az": "sol",
+			"en": "left",
+			"es": "izquierda",
+			"ru": "налево",
+			"tr": "sol"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f010",
+		"word": "məqsəd",
+		"translation": "goal",
+		"translation_translations": {
+			"az": "məqsəd",
+			"en": "goal",
+			"es": "meta",
+			"ru": "цель",
+			"tr": "hedef"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f011",
+		"word": "layihə",
+		"translation": "project",
+		"translation_translations": {
+			"az": "layihə",
+			"en": "project",
+			"es": "proyecto",
+			"ru": "проект",
+			"tr": "proje"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0d35733f-82d2-46be-a0fa-52b90bc8f012",
+		"word": "inkişaf etdirmək",
+		"translation": "to improve",
+		"translation_translations": {
+			"az": "inkişaf etdirmək",
+			"en": "to improve",
+			"es": "mejorar",
+			"ru": "улучшать",
+			"tr": "gelistirmek"
+		},
+		"pronunciation_url": null,
+		"created_at": "2026-03-31T00:00:00.000Z"
+	}
+]

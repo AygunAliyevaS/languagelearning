@@ -1,4 +1,5 @@
 import sql from "@/app/api/utils/sql";
+import { awardUserActivity } from '@/app/api/utils/user-progress';
 
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
@@ -67,7 +68,21 @@ export async function POST(request) {
         repetition_count = EXCLUDED.repetition_count
       RETURNING *
     `;
-    return Response.json(result[0]);
+
+    const xpEarned = quality >= 3 ? 10 : 4;
+    const history = await sql`
+      INSERT INTO review_attempt_history (user_id, word_id, quality, xp_earned, completed_at)
+      VALUES (${userId}, ${wordId}, ${quality}, ${xpEarned}, CURRENT_TIMESTAMP)
+      RETURNING *
+    `;
+    const activity = await awardUserActivity({ userId, xpEarned });
+
+    return Response.json({
+      review: result[0],
+      reviewActivity: history[0],
+      user: activity.user,
+      xpEarned: activity.xpEarned,
+    });
   } catch (error) {
     console.error(error);
     return Response.json(

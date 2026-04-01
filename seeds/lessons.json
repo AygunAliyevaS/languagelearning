@@ -1,0 +1,852 @@
+[
+	{
+		"id": "74a8a6e2-3fd8-4a4b-9d2c-e6d98f3f0a11",
+		"title": "Hello and Introductions",
+		"description": "Meet people, introduce yourself, and ask simple personal questions.",
+		"title_translations": {
+			"az": "Salam və tanışlıq",
+			"en": "Hello and Introductions",
+			"es": "Saludos y presentaciones",
+			"ru": "Приветствия и знакомство",
+			"tr": "Selamlasma ve tanisma"
+		},
+		"description_translations": {
+			"az": "İnsanlarla tanış ol, özünü təqdim et və sadə şəxsi suallar ver.",
+			"en": "Meet people, introduce yourself, and ask simple personal questions.",
+			"es": "Conoce gente, preséntate y haz preguntas personales sencillas.",
+			"ru": "Знакомьтесь, представляйтесь и задавайте простые личные вопросы.",
+			"tr": "Insanlarla tanis, kendini tanit ve basit kisisel sorular sor."
+		},
+		"level_code": "A1",
+		"order_index": 1,
+		"content": [
+			{
+				"type": "goal",
+				"title": {
+					"az": "Bu dərsdə öyrənəcəklərin",
+					"en": "What you will learn",
+					"es": "Lo que aprenderás",
+					"ru": "Что вы изучите",
+					"tr": "Bu derste ögreneceklerin"
+				},
+				"items": [
+					{
+						"az": "Təbii şəkildə salamlaşmaq və sağollaşmaq",
+						"en": "Say hello and goodbye naturally",
+						"es": "Saludar y despedirse con naturalidad",
+						"ru": "Естественно здороваться и прощаться",
+						"tr": "Dogal sekilde selam vermek ve vedalasmak"
+					},
+					{
+						"az": "Özünü inamla təqdim etmək",
+						"en": "Introduce yourself with confidence",
+						"es": "Presentarte con confianza",
+						"ru": "Уверенно представляться",
+						"tr": "Kendini güvenle tanitmak"
+					},
+					{
+						"az": "Kimliklə bağlı sadə sualları verib cavablandırmaq",
+						"en": "Ask and answer basic identity questions",
+						"es": "Hacer y responder preguntas básicas de identidad",
+						"ru": "Задавать и отвечать на базовые вопросы о себе",
+						"tr": "Kimlik hakkinda temel sorular sormak ve cevaplamak"
+					}
+				]
+			},
+			{
+				"type": "dialogue",
+				"title": {
+					"az": "Kiçik dialoq",
+					"en": "Mini dialogue",
+					"es": "Mini diálogo",
+					"ru": "Короткий диалог",
+					"tr": "Kisa diyalog"
+				},
+				"lines": [
+					{
+						"az": "A: Salam, mənim adım Leyladır.",
+						"en": "A: Hello, my name is Leyla.",
+						"es": "A: Hola, me llamo Leyla.",
+						"ru": "A: Здравствуйте, меня зовут Лейла.",
+						"tr": "A: Merhaba, benim adim Leyla."
+					},
+					{
+						"az": "B: Salam Leyla, mən Kamranam. Tanış olmağıma şadam.",
+						"en": "B: Hi Leyla, I am Kamran. Nice to meet you.",
+						"es": "B: Hola Leyla, soy Kamran. Encantado de conocerte.",
+						"ru": "B: Привет, Лейла, я Камран. Рад познакомиться.",
+						"tr": "B: Selam Leyla, ben Kamranim. Tanistigima memnun oldum."
+					},
+					{
+						"az": "A: Mən də şadam. Haradansan?",
+						"en": "A: Nice to meet you too. Where are you from?",
+						"es": "A: Igualmente. ¿De dónde eres?",
+						"ru": "A: Мне тоже приятно. Откуда ты?",
+						"tr": "A: Ben de memnun oldum. Nerelisin?"
+					},
+					{
+						"az": "B: Mən Gəncədənəm.",
+						"en": "B: I am from Ganja.",
+						"es": "B: Soy de Ganja.",
+						"ru": "B: Я из Гянджи.",
+						"tr": "B: Ben Gence'denim."
+					}
+				]
+			},
+			{
+				"type": "practice",
+				"title": {
+					"az": "Ucadan danış",
+					"en": "Speak out loud",
+					"es": "Habla en voz alta",
+					"ru": "Скажи вслух",
+					"tr": "Yüksek sesle konus"
+				},
+				"prompt": {
+					"az": "Özünü üç qısa cümlə ilə təqdim et.",
+					"en": "Introduce yourself in three short sentences.",
+					"es": "Preséntate en tres frases cortas.",
+					"ru": "Представьтесь тремя короткими предложениями.",
+					"tr": "Kendini üc kisa cümleyle tanit."
+				}
+			},
+			{
+				"type": "quiz",
+				"title": {
+					"az": "Doğru salamı seç",
+					"en": "Choose the right greeting",
+					"es": "Elige el saludo correcto",
+					"ru": "Выберите правильное приветствие",
+					"tr": "Dogru selami sec"
+				},
+				"prompt": {
+					"az": "“Hello” sözünə uyğun Azərbaycan variantını seç.",
+					"en": "Choose the Azerbaijani phrase that means “Hello”.",
+					"es": "Elige la frase en azerbaiyano que significa “Hola”.",
+					"ru": "Выберите азербайджанскую фразу со значением “Здравствуйте”.",
+					"tr": "“Hello” anlamina gelen Azerbaycanca ifadeyi sec."
+				},
+				"options": ["Sağ ol", "Salam", "Gecən xeyrə", "Zəhmət olmasa"],
+				"correctIndex": 1,
+				"explanation": {
+					"az": "“Salam” ən neytral və gündəlik salamlaşmadır.",
+					"en": "“Salam” is the standard everyday greeting.",
+					"es": "“Salam” es el saludo cotidiano más común.",
+					"ru": "“Salam” - это нейтральное повседневное приветствие.",
+					"tr": "“Salam” günlük hayatta kullanilan en yaygin selamdir."
+				}
+			},
+			{
+				"type": "textInput",
+				"title": {
+					"az": "Özünü yaz",
+					"en": "Write your introduction",
+					"es": "Escribe tu presentación",
+					"ru": "Напишите представление",
+					"tr": "Kendini yaz"
+				},
+				"prompt": {
+					"az": "“My name is Leyla.” cümləsini Azərbaycan dilində yaz.",
+					"en": "Type the sentence “My name is Leyla.” in Azerbaijani.",
+					"es": "Escribe la frase “Me llamo Leyla.” en azerbaiyano.",
+					"ru": "Напишите предложение “Меня зовут Лейла.” на азербайджанском.",
+					"tr": "“My name is Leyla.” cümlesini Azerbaycanca yaz."
+				},
+				"placeholder": {
+					"az": "Mənim adım Leyladır",
+					"en": "Mənim adım Leyladır",
+					"es": "Mənim adım Leyladır",
+					"ru": "Mənim adım Leyladır",
+					"tr": "Mənim adım Leyladır"
+				},
+				"acceptedAnswers": ["Mənim adım Leyladır", "Menim adim Leyladir"],
+				"explanation": {
+					"az": "“Mənim adım...” forması özünü təqdim etmək üçün ən sadə modeldir.",
+					"en": "“Mənim adım...” is the basic pattern for introducing yourself.",
+					"es": "“Mənim adım...” es la estructura básica para presentarte.",
+					"ru": "“Mənim adım...” - базовая модель для представления.",
+					"tr": "“Mənim adım...” kendini tanitmanin temel kalibidir."
+				}
+			},
+			{
+				"type": "match",
+				"title": {
+					"az": "Dialoq cütləri",
+					"en": "Dialogue pairs",
+					"es": "Parejas del diálogo",
+					"ru": "Пары из диалога",
+					"tr": "Diyalog eslestirmesi"
+				},
+				"prompt": {
+					"az": "Mənaları uyğun Azərbaycan ifadəsi ilə birləşdir.",
+					"en": "Match each meaning with the correct Azerbaijani phrase.",
+					"es": "Relaciona cada significado con la frase correcta en azerbaiyano.",
+					"ru": "Сопоставьте значение с правильной азербайджанской фразой.",
+					"tr": "Anlamlari dogru Azerbaycanca ifadeyle eslestir."
+				},
+				"pairs": [
+					{
+						"id": "intro-1",
+						"left": {
+							"az": "Tanış olmağıma şadam",
+							"en": "Nice to meet you",
+							"es": "Encantado de conocerte",
+							"ru": "Рад познакомиться",
+							"tr": "Tanistigima memnun oldum"
+						},
+						"right": "Tanış olmağıma şadam"
+					},
+					{
+						"id": "intro-2",
+						"left": {
+							"az": "Haradansan?",
+							"en": "Where are you from?",
+							"es": "¿De dónde eres?",
+							"ru": "Откуда ты?",
+							"tr": "Nerelisin?"
+						},
+						"right": "Haradansan?"
+					},
+					{
+						"id": "intro-3",
+						"left": {
+							"az": "Mən Gəncədənəm",
+							"en": "I am from Ganja",
+							"es": "Soy de Ganja",
+							"ru": "Я из Гянджи",
+							"tr": "Ben Gence'denim"
+						},
+						"right": "Mən Gəncədənəm"
+					}
+				],
+				"explanation": {
+					"az": "Bu üç cümlə tanışlıq dialoqunun əsas sütunlarıdır.",
+					"en": "These three lines form the backbone of a simple introduction dialogue.",
+					"es": "Estas tres frases forman la base de un diálogo de presentación.",
+					"ru": "Эти три реплики составляют основу диалога знакомства.",
+					"tr": "Bu üç ifade basit bir tanisma diyalogunun temelidir."
+				}
+			}
+		],
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "3e7e1d7d-7f29-43f1-8f1f-c4a3c1bb2a21",
+		"title": "Daily Routine",
+		"description": "Talk about your morning, work, and evening habits with clear simple verbs.",
+		"title_translations": {
+			"az": "Gündəlik rejim",
+			"en": "Daily Routine",
+			"es": "Rutina diaria",
+			"ru": "Распорядок дня",
+			"tr": "Günlük rutin"
+		},
+		"description_translations": {
+			"az": "Səhərini, işini və axşam vərdişlərini sadə fellərlə təsvir et.",
+			"en": "Talk about your morning, work, and evening habits with clear simple verbs.",
+			"es": "Habla sobre tu mañana, tu trabajo y tus hábitos de la tarde con verbos simples.",
+			"ru": "Рассказывайте о своём утре, работе и вечерних привычках простыми глаголами.",
+			"tr": "Sabahini, isini ve aksam aliskanliklarini basit fiillerle anlat."
+		},
+		"level_code": "A1",
+		"order_index": 2,
+		"content": [
+			{
+				"type": "goal",
+				"title": {
+					"az": "Diqqət mərkəzi",
+					"en": "Focus",
+					"es": "Enfoque",
+					"ru": "Фокус",
+					"tr": "Odak"
+				},
+				"items": [
+					{
+						"az": "Vərdişlər üçün indiki zamanı işlətmək",
+						"en": "Use present simple for habits",
+						"es": "Usar el presente para hábitos",
+						"ru": "Использовать настоящее время для привычек",
+						"tr": "Aliskanliklar icin genis zamani kullanmak"
+					},
+					{
+						"az": "Zaman ifadələri ilə rejimini danışmaq",
+						"en": "Describe your routine with time markers",
+						"es": "Describir tu rutina con marcadores de tiempo",
+						"ru": "Описывать распорядок с указателями времени",
+						"tr": "Rutini zaman belirtecleriyle anlatmak"
+					},
+					{
+						"az": "Qısa gündəlik abzas qurmaq",
+						"en": "Build short routine paragraphs",
+						"es": "Construir párrafos cortos sobre la rutina",
+						"ru": "Составлять короткие абзацы о распорядке",
+						"tr": "Kisa rutin paragraflari kurmak"
+					}
+				]
+			},
+			{
+				"type": "timeline",
+				"title": {
+					"az": "Nümunəvi gün",
+					"en": "Sample routine",
+					"es": "Rutina de ejemplo",
+					"ru": "Пример распорядка",
+					"tr": "Örnek rutin"
+				},
+				"items": [
+					{
+						"az": "Mən saat yeddidə oyanıram.",
+						"en": "I wake up at seven.",
+						"es": "Me despierto a las siete.",
+						"ru": "Я просыпаюсь в семь.",
+						"tr": "Saat yedide uyanirim."
+					},
+					{
+						"az": "Çay içirəm və günümü planlaşdırıram.",
+						"en": "I drink tea and plan my day.",
+						"es": "Tomo té y organizo mi día.",
+						"ru": "Я пью чай и планирую день.",
+						"tr": "Cay icer ve günümü planlarim."
+					},
+					{
+						"az": "Mən doqquzdan beşə qədər işləyirəm.",
+						"en": "I work from nine to five.",
+						"es": "Trabajo de nueve a cinco.",
+						"ru": "Я работаю с девяти до пяти.",
+						"tr": "Dokuzdan bese kadar calisirim."
+					},
+					{
+						"az": "Axşam Azərbaycan dili öyrənirəm.",
+						"en": "I study Azerbaijani in the evening.",
+						"es": "Estudio azerbaiyano por la tarde.",
+						"ru": "Вечером я изучаю азербайджанский.",
+						"tr": "Aksam Azerbaycanca calisirim."
+					}
+				]
+			},
+			{
+				"type": "quiz",
+				"title": {
+					"az": "Səhər cümləsini tap",
+					"en": "Find the morning sentence",
+					"es": "Encuentra la frase de la mañana",
+					"ru": "Найдите утреннюю фразу",
+					"tr": "Sabah cümlesini bul"
+				},
+				"prompt": {
+					"az": "“I wake up at seven.” cümləsinin Azərbaycan variantını seç.",
+					"en": "Choose the Azerbaijani sentence for “I wake up at seven.”",
+					"es": "Elige la frase en azerbaiyano para “Me despierto a las siete”.",
+					"ru": "Выберите азербайджанское предложение для “Я просыпаюсь в семь”.",
+					"tr": "“I wake up at seven.” cümlesinin Azerbaycancasini sec."
+				},
+				"options": ["Mən saat yeddidə oyanıram", "Mən saat doqquzda işləyirəm", "Mən çay içirəm", "Axşam kitab oxuyuram"],
+				"correctIndex": 0,
+				"explanation": {
+					"az": "“Oyanıram” gündəlik vərdiş üçün işlənir və saat “yeddidə” vaxtı bildirir.",
+					"en": "“Oyanıram” expresses a routine action, and “yeddidə” gives the time.",
+					"es": "“Oyanıram” expresa una rutina y “yeddidə” marca la hora.",
+					"ru": "“Oyanıram” обозначает регулярное действие, а “yeddidə” указывает время.",
+					"tr": "“Oyanıram” aliskanligi anlatir, “yeddidə” ise saati belirtir."
+				}
+			},
+			{
+				"type": "textInput",
+				"title": {
+					"az": "Axşam planını yaz",
+					"en": "Write the evening plan",
+					"es": "Escribe el plan de la tarde",
+					"ru": "Напишите вечерний план",
+					"tr": "Aksam planini yaz"
+				},
+				"prompt": {
+					"az": "“I study Azerbaijani in the evening.” cümləsini Azərbaycan dilində yaz.",
+					"en": "Type “I study Azerbaijani in the evening.” in Azerbaijani.",
+					"es": "Escribe “Estudio azerbaiyano por la tarde.” en azerbaiyano.",
+					"ru": "Напишите “Вечером я изучаю азербайджанский.” на азербайджанском.",
+					"tr": "“I study Azerbaijani in the evening.” cümlesini Azerbaycanca yaz."
+				},
+				"placeholder": {
+					"az": "Axşam Azərbaycan dili öyrənirəm",
+					"en": "Axşam Azərbaycan dili öyrənirəm",
+					"es": "Axşam Azərbaycan dili öyrənirəm",
+					"ru": "Axşam Azərbaycan dili öyrənirəm",
+					"tr": "Axşam Azərbaycan dili öyrənirəm"
+				},
+				"acceptedAnswers": ["Axşam Azərbaycan dili öyrənirəm", "Axsam Azerbaycan dili oyrenirem"],
+				"explanation": {
+					"az": "“Axşam” zaman zərfidir, “öyrənirəm” isə birinci şəxsin indiki zaman formasıdır.",
+					"en": "“Axşam” marks the time, and “öyrənirəm” is the first-person present form.",
+					"es": "“Axşam” indica el momento y “öyrənirəm” es la forma de primera persona.",
+					"ru": "“Axşam” обозначает время, а “öyrənirəm” - форму первого лица настоящего времени.",
+					"tr": "“Axşam” zamani verir, “öyrənirəm” ise birinci tekil simdiki zamandir."
+				}
+			},
+			{
+				"type": "match",
+				"title": {
+					"az": "Rejimi uyğunlaşdır",
+					"en": "Match the routine",
+					"es": "Relaciona la rutina",
+					"ru": "Сопоставьте распорядок",
+					"tr": "Rutini eslestir"
+				},
+				"prompt": {
+					"az": "Mənaları düzgün Azərbaycan ifadəsi ilə uyğunlaşdır.",
+					"en": "Match each routine meaning with its Azerbaijani phrase.",
+					"es": "Relaciona cada significado de la rutina con su frase en azerbaiyano.",
+					"ru": "Сопоставьте значение режима дня с азербайджанской фразой.",
+					"tr": "Her rutin anlamini Azerbaycanca ifadesiyle eslestir."
+				},
+				"pairs": [
+					{
+						"id": "routine-1",
+						"left": {
+							"az": "Mən çay içirəm və günümü planlaşdırıram",
+							"en": "I drink tea and plan my day",
+							"es": "Tomo té y organizo mi día",
+							"ru": "Я пью чай и планирую день",
+							"tr": "Cay icer ve günümü planlarim"
+						},
+						"right": "Çay içirəm və günümü planlaşdırıram"
+					},
+					{
+						"id": "routine-2",
+						"left": {
+							"az": "Mən doqquzdan beşə qədər işləyirəm",
+							"en": "I work from nine to five",
+							"es": "Trabajo de nueve a cinco",
+							"ru": "Я работаю с девяти до пяти",
+							"tr": "Dokuzdan bese kadar calisirim"
+						},
+						"right": "Mən doqquzdan beşə qədər işləyirəm"
+					},
+					{
+						"id": "routine-3",
+						"left": {
+							"az": "Mən saat yeddidə oyanıram",
+							"en": "I wake up at seven",
+							"es": "Me despierto a las siete",
+							"ru": "Я просыпаюсь в семь",
+							"tr": "Saat yedide uyanirim"
+						},
+						"right": "Mən saat yeddidə oyanıram"
+					}
+				],
+				"explanation": {
+					"az": "Gündəlik rejimdə zaman və fəaliyyət birlikdə öyrənilir.",
+					"en": "Daily-routine language works best when you connect actions and time markers.",
+					"es": "La rutina diaria se aprende mejor uniendo acciones y marcadores de tiempo.",
+					"ru": "Режим дня легче усваивается, когда вы связываете действие и время.",
+					"tr": "Günlük rutin dili, eylem ve zaman belirtecini birlikte kurunca daha iyi oturur."
+				}
+			}
+		],
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "0c73ca5d-b342-4fdf-a09a-0328b2aeac31",
+		"title": "City Navigation",
+		"description": "Ask for directions, describe places, and move around the city with confidence.",
+		"title_translations": {
+			"az": "Şəhərdə yol tapmaq",
+			"en": "City Navigation",
+			"es": "Orientación en la ciudad",
+			"ru": "Ориентация в городе",
+			"tr": "Sehirde yön bulma"
+		},
+		"description_translations": {
+			"az": "Yol soruş, məkanları təsvir et və şəhərdə inamla hərəkət et.",
+			"en": "Ask for directions, describe places, and move around the city with confidence.",
+			"es": "Pide direcciones, describe lugares y muévete por la ciudad con confianza.",
+			"ru": "Спрашивайте дорогу, описывайте места и уверенно передвигайтесь по городу.",
+			"tr": "Yol sor, yerleri tarif et ve sehirde güvenle hareket et."
+		},
+		"level_code": "A2",
+		"order_index": 1,
+		"content": [
+			{
+				"type": "goal",
+				"title": {
+					"az": "Əsas nəticələr",
+					"en": "Key outcomes",
+					"es": "Resultados clave",
+					"ru": "Ключевые результаты",
+					"tr": "Temel kazanımlar"
+				},
+				"items": [
+					{
+						"az": "Məkanların harada olduğunu soruşmaq",
+						"en": "Ask where places are",
+						"es": "Preguntar dónde están los lugares",
+						"ru": "Спрашивать, где находятся места",
+						"tr": "Yerlerin nerede oldugunu sormak"
+					},
+					{
+						"az": "Əsas istiqamət dilini anlamaq",
+						"en": "Understand basic directional language",
+						"es": "Entender el lenguaje básico de dirección",
+						"ru": "Понимать базовую лексику направления",
+						"tr": "Temel yön dilini anlamak"
+					},
+					{
+						"az": "Qısa və aydın göstərişlər vermək",
+						"en": "Give short instructions clearly",
+						"es": "Dar instrucciones cortas con claridad",
+						"ru": "Чётко давать короткие инструкции",
+						"tr": "Kisa ve acik talimat vermek"
+					}
+				]
+			},
+			{
+				"type": "dialogue",
+				"title": {
+					"az": "Küçə dialoqu",
+					"en": "Street dialogue",
+					"es": "Diálogo en la calle",
+					"ru": "Уличный диалог",
+					"tr": "Sokak diyalogu"
+				},
+				"lines": [
+					{
+						"az": "A: Bağışlayın, stansiya haradadır?",
+						"en": "A: Excuse me, where is the station?",
+						"es": "A: Disculpe, ¿dónde está la estación?",
+						"ru": "A: Извините, где станция?",
+						"tr": "A: Affedersiniz, istasyon nerede?"
+					},
+					{
+						"az": "B: Düz gedin, sonra bankın yanında sola dönün.",
+						"en": "B: Go straight, then turn left at the bank.",
+						"es": "B: Siga recto y luego gire a la izquierda en el banco.",
+						"ru": "B: Идите прямо, затем поверните налево у банка.",
+						"tr": "B: Dümdüz gidin, sonra bankada sola dönün."
+					},
+					{
+						"az": "A: Uzaqdır?",
+						"en": "A: Is it far?",
+						"es": "A: ¿Está lejos?",
+						"ru": "A: Это далеко?",
+						"tr": "A: Uzak mi?"
+					},
+					{
+						"az": "B: Xeyr, təxminən beş dəqiqəlik yoldur.",
+						"en": "B: No, it is about five minutes away.",
+						"es": "B: No, está a unos cinco minutos.",
+						"ru": "B: Нет, это примерно в пяти минутах.",
+						"tr": "B: Hayir, yaklasik bes dakika uzaklikta."
+					}
+				]
+			},
+			{
+				"type": "quiz",
+				"title": {
+					"az": "İstiqaməti seç",
+					"en": "Choose the direction",
+					"es": "Elige la dirección",
+					"ru": "Выберите направление",
+					"tr": "Yönü sec"
+				},
+				"prompt": {
+					"az": "“Turn left at the bank.” cümləsinə uyğun Azərbaycan variantını seç.",
+					"en": "Choose the Azerbaijani sentence for “Turn left at the bank.”",
+					"es": "Elige la frase en azerbaiyano para “Gira a la izquierda en el banco”.",
+					"ru": "Выберите азербайджанское предложение для “Поверните налево у банка”.",
+					"tr": "“Turn left at the bank.” cümlesinin Azerbaycancasini sec."
+				},
+				"options": ["Bankın yanında sola dönün", "Düz gedin", "Sağa baxın", "Uzaqdır"],
+				"correctIndex": 0,
+				"explanation": {
+					"az": "“Sola dönün” istiqaməti, “bankın yanında” isə orientiri göstərir.",
+					"en": "“Sola dönün” gives the direction, and “bankın yanında” marks the landmark.",
+					"es": "“Sola dönün” da la dirección y “bankın yanında” marca la referencia.",
+					"ru": "“Sola dönün” обозначает направление, а “bankın yanında” - ориентир.",
+					"tr": "“Sola dönün” yönü verir, “bankın yanında” ise isaret noktasini gösterir."
+				}
+			},
+			{
+				"type": "textInput",
+				"title": {
+					"az": "Yol soruş",
+					"en": "Ask for directions",
+					"es": "Pregunta direcciones",
+					"ru": "Спросите дорогу",
+					"tr": "Yol sor"
+				},
+				"prompt": {
+					"az": "“Where is the station?” cümləsini Azərbaycan dilində yaz.",
+					"en": "Type “Where is the station?” in Azerbaijani.",
+					"es": "Escribe “¿Dónde está la estación?” en azerbaiyano.",
+					"ru": "Напишите “Где станция?” на азербайджанском.",
+					"tr": "“Where is the station?” cümlesini Azerbaycanca yaz."
+				},
+				"placeholder": {
+					"az": "Stansiya haradadır?",
+					"en": "Stansiya haradadır?",
+					"es": "Stansiya haradadır?",
+					"ru": "Stansiya haradadır?",
+					"tr": "Stansiya haradadır?"
+				},
+				"acceptedAnswers": ["Stansiya haradadır?", "Stansiya haradadir", "Bağışlayın, stansiya haradadır?", "Bagislayin stansiya haradadir"],
+				"explanation": {
+					"az": "Nəzakətli formada “Bağışlayın” əlavə etmək də düzgündür.",
+					"en": "Adding “Bağışlayın” at the start makes the question more polite.",
+					"es": "Añadir “Bağışlayın” al inicio hace la pregunta más cortés.",
+					"ru": "Добавление “Bağışlayın” делает вопрос вежливее.",
+					"tr": "Basina “Bağışlayın” eklemek soruyu daha kibar yapar."
+				}
+			},
+			{
+				"type": "match",
+				"title": {
+					"az": "Yol ifadələrini uyğunlaşdır",
+					"en": "Match the direction phrases",
+					"es": "Relaciona las frases de dirección",
+					"ru": "Сопоставьте фразы направления",
+					"tr": "Yön ifadelerini eslestir"
+				},
+				"prompt": {
+					"az": "İstiqamət mənalarını düzgün Azərbaycan ifadələri ilə uyğunlaşdır.",
+					"en": "Match the direction meanings with the correct Azerbaijani phrases.",
+					"es": "Relaciona los significados de dirección con las frases correctas en azerbaiyano.",
+					"ru": "Сопоставьте значения направлений с азербайджанскими фразами.",
+					"tr": "Yön anlamlarini dogru Azerbaycanca ifadelerle eslestir."
+				},
+				"pairs": [
+					{
+						"id": "city-1",
+						"left": {
+							"az": "Düz gedin",
+							"en": "Go straight",
+							"es": "Sigue recto",
+							"ru": "Идите прямо",
+							"tr": "Dümdüz gidin"
+						},
+						"right": "Düz gedin"
+					},
+					{
+						"id": "city-2",
+						"left": {
+							"az": "Sola dönün",
+							"en": "Turn left",
+							"es": "Gira a la izquierda",
+							"ru": "Поверните налево",
+							"tr": "Sola dönün"
+						},
+						"right": "Sola dönün"
+					},
+					{
+						"id": "city-3",
+						"left": {
+							"az": "Təxminən beş dəqiqəlik yol",
+							"en": "About five minutes away",
+							"es": "A unos cinco minutos",
+							"ru": "Примерно в пяти минутах",
+							"tr": "Yaklasik bes dakika uzaklikta"
+						},
+						"right": "Təxminən beş dəqiqəlik yoldur"
+					}
+				],
+				"explanation": {
+					"az": "Yol tapmaq üçün istiqamət felləri və məsafə ifadələri birlikdə işlənir.",
+					"en": "Navigation language depends on direction verbs plus distance expressions.",
+					"es": "La orientación combina verbos de dirección y expresiones de distancia.",
+					"ru": "Язык навигации строится на глаголах направления и выражениях расстояния.",
+					"tr": "Yön bulma dili, yön fiilleriyle mesafe ifadelerini birlikte kullanir."
+				}
+			}
+		],
+		"created_at": "2026-03-31T00:00:00.000Z"
+	},
+	{
+		"id": "f2ed483c-0b93-4cec-8b78-fb00a88e94c5",
+		"title": "Work and Goals",
+		"description": "Discuss plans, ambitions, and ongoing projects in a more expressive way.",
+		"title_translations": {
+			"az": "İş və məqsədlər",
+			"en": "Work and Goals",
+			"es": "Trabajo y metas",
+			"ru": "Работа и цели",
+			"tr": "Is ve hedefler"
+		},
+		"description_translations": {
+			"az": "Planlarını, ambisiyalarını və davam edən layihələrini daha ifadəli şəkildə müzakirə et.",
+			"en": "Discuss plans, ambitions, and ongoing projects in a more expressive way.",
+			"es": "Habla de tus planes, ambiciones y proyectos en curso de forma más expresiva.",
+			"ru": "Обсуждайте планы, амбиции и текущие проекты более выразительно.",
+			"tr": "Planlarini, hedeflerini ve süren projelerini daha etkili bicimde anlat."
+		},
+		"level_code": "B1",
+		"order_index": 1,
+		"content": [
+			{
+				"type": "goal",
+				"title": {
+					"az": "Bu dərs nələri əhatə edir",
+					"en": "This lesson covers",
+					"es": "Esta lección cubre",
+					"ru": "Этот урок охватывает",
+					"tr": "Bu dersin kapsadiklari"
+				},
+				"items": [
+					{
+						"az": "Şəxsi məqsədlər haqqında danışmaq",
+						"en": "Talk about personal goals",
+						"es": "Hablar de metas personales",
+						"ru": "Говорить о личных целях",
+						"tr": "Kisisel hedeflerden söz etmek"
+					},
+					{
+						"az": "Nə üzərində işlədiyini izah etmək",
+						"en": "Explain what you are working on",
+						"es": "Explicar en qué estás trabajando",
+						"ru": "Объяснять, над чем вы работаете",
+						"tr": "Ne üzerinde calistigini aciklamak"
+					},
+					{
+						"az": "Fikirləri çünki, ona görə və ancaq ilə bağlamaq",
+						"en": "Connect ideas with because, so, and however",
+						"es": "Unir ideas con porque, así que y sin embargo",
+						"ru": "Связывать идеи словами потому что, поэтому и однако",
+						"tr": "Fikirleri because, so ve however ile baglamak"
+					}
+				]
+			},
+			{
+				"type": "writing",
+				"title": {
+					"az": "Düşüncə yazısı",
+					"en": "Reflection",
+					"es": "Reflexión",
+					"ru": "Размышление",
+					"tr": "Yansima"
+				},
+				"prompt": {
+					"az": "Bu il inkişaf etdirmək istədiyin bir bacarıq haqqında dörd cümlə yaz və bunun niyə vacib olduğunu izah et.",
+					"en": "Write four sentences about a skill you want to improve this year and why it matters.",
+					"es": "Escribe cuatro frases sobre una habilidad que quieres mejorar este año y por qué importa.",
+					"ru": "Напишите четыре предложения о навыке, который хотите улучшить в этом году, и почему он важен.",
+					"tr": "Bu yil gelistirmek istedigin bir beceri hakkinda dört cümle yaz ve neden önemli oldugunu acikla."
+				}
+			},
+			{
+				"type": "quiz",
+				"title": {
+					"az": "Bağlayıcını seç",
+					"en": "Choose the connector",
+					"es": "Elige el conector",
+					"ru": "Выберите союз",
+					"tr": "Baglaci sec"
+				},
+				"prompt": {
+					"az": "Ziddiyyət bildirmək üçün ən uyğun Azərbaycan bağlayıcısını seç.",
+					"en": "Choose the Azerbaijani connector that best shows contrast.",
+					"es": "Elige el conector en azerbaiyano que mejor exprese contraste.",
+					"ru": "Выберите азербайджанский союз, который лучше всего выражает противопоставление.",
+					"tr": "Karsitlik bildiren en uygun Azerbaycanca baglaci sec."
+				},
+				"options": ["çünki", "ona görə", "ancaq", "və"],
+				"correctIndex": 2,
+				"explanation": {
+					"az": "“Ancaq” iki zidd fikir arasında körpü yaradır.",
+					"en": "“Ancaq” introduces a contrast between two ideas.",
+					"es": "“Ancaq” introduce contraste entre dos ideas.",
+					"ru": "“Ancaq” связывает две противопоставленные идеи.",
+					"tr": "“Ancaq” iki zit fikri birbirine baglar."
+				}
+			},
+			{
+				"type": "textInput",
+				"title": {
+					"az": "Məqsədini ifadə et",
+					"en": "State your goal",
+					"es": "Expresa tu meta",
+					"ru": "Сформулируйте цель",
+					"tr": "Hedefini ifade et"
+				},
+				"prompt": {
+					"az": "“This year I want to improve my speaking.” cümləsini Azərbaycan dilində yaz.",
+					"en": "Type “This year I want to improve my speaking.” in Azerbaijani.",
+					"es": "Escribe “Este año quiero mejorar mi expresión oral.” en azerbaiyano.",
+					"ru": "Напишите “В этом году я хочу улучшить свою речь.” на азербайджанском.",
+					"tr": "“This year I want to improve my speaking.” cümlesini Azerbaycanca yaz."
+				},
+				"placeholder": {
+					"az": "Bu il danışığımı inkişaf etdirmək istəyirəm",
+					"en": "Bu il danışığımı inkişaf etdirmək istəyirəm",
+					"es": "Bu il danışığımı inkişaf etdirmək istəyirəm",
+					"ru": "Bu il danışığımı inkişaf etdirmək istəyirəm",
+					"tr": "Bu il danışığımı inkişaf etdirmək istəyirəm"
+				},
+				"acceptedAnswers": ["Bu il danışığımı inkişaf etdirmək istəyirəm", "Bu il danisigimi inkisaf etdirmek isteyirem"],
+				"explanation": {
+					"az": "“İstəyirəm” şəxsi niyyəti, “inkişaf etdirmək” isə məqsədi göstərir.",
+					"en": "“İstəyirəm” expresses personal intention, and “inkişaf etdirmək” states the goal.",
+					"es": "“İstəyirəm” expresa intención personal y “inkişaf etdirmək” marca la meta.",
+					"ru": "“İstəyirəm” выражает намерение, а “inkişaf etdirmək” обозначает цель.",
+					"tr": "“İstəyirəm” niyeti, “inkişaf etdirmək” ise hedefi belirtir."
+				}
+			},
+			{
+				"type": "match",
+				"title": {
+					"az": "Məqsəd sözlərini uyğunlaşdır",
+					"en": "Match the goal phrases",
+					"es": "Relaciona las frases de metas",
+					"ru": "Сопоставьте фразы о целях",
+					"tr": "Hedef ifadelerini eslestir"
+				},
+				"prompt": {
+					"az": "Fikirləri düzgün Azərbaycan ifadələri ilə uyğunlaşdır.",
+					"en": "Match each idea with the correct Azerbaijani phrase.",
+					"es": "Relaciona cada idea con la frase correcta en azerbaiyano.",
+					"ru": "Сопоставьте идею с правильной азербайджанской фразой.",
+					"tr": "Her fikri dogru Azerbaycanca ifadeyle eslestir."
+				},
+				"pairs": [
+					{
+						"id": "goals-1",
+						"left": {
+							"az": "Şəxsi məqsədlər haqqında danışmaq",
+							"en": "Talk about personal goals",
+							"es": "Hablar de metas personales",
+							"ru": "Говорить о личных целях",
+							"tr": "Kisisel hedeflerden söz etmek"
+						},
+						"right": "Şəxsi məqsədlər haqqında danışmaq"
+					},
+					{
+						"id": "goals-2",
+						"left": {
+							"az": "Nə üzərində işlədiyini izah etmək",
+							"en": "Explain what you are working on",
+							"es": "Explicar en qué estás trabajando",
+							"ru": "Объяснять, над чем вы работаете",
+							"tr": "Ne üzerinde calistigini aciklamak"
+						},
+						"right": "Nə üzərində işlədiyini izah etmək"
+					},
+					{
+						"id": "goals-3",
+						"left": {
+							"az": "Fikirləri ancaq ilə bağlamaq",
+							"en": "Connect ideas with however",
+							"es": "Unir ideas con sin embargo",
+							"ru": "Связывать идеи словом однако",
+							"tr": "Fikirleri ancaq ile baglamak"
+						},
+						"right": "Ancaq"
+					}
+				],
+				"explanation": {
+					"az": "Bu səviyyədə fikir qurmaq üçün məqsəd dili və bağlayıcılar birlikdə işlənir.",
+					"en": "At this level, goal language and connectors work together to build more nuanced ideas.",
+					"es": "En este nivel, el lenguaje de metas y los conectores trabajan juntos para ideas más matizadas.",
+					"ru": "На этом уровне язык целей и союзы помогают строить более точные мысли.",
+					"tr": "Bu seviyede hedef dili ve baglaclar daha nüansli fikirler kurmaya yardim eder."
+				}
+			}
+		],
+		"created_at": "2026-03-31T00:00:00.000Z"
+	}
+]

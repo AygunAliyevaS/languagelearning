@@ -63,7 +63,7 @@ function useOptionalRef<T>(ref?: Ref<T> | null): RefObject<T> {
 }
 
 const CreatePolymorphicComponent = forwardRef(
-  // @ts-ignore
+  // @ts-expect-error -- generic forwardRef signature doesn't propagate the As type param
   function CreatePolymorphicComponentRender<As extends ElementType = 'div'>(
     { as, children, renderId, onError, ...rest }: PolymorphicProps<As>,
     forwardedRef?: Ref<Element>

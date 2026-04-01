@@ -3,7 +3,7 @@ async function upload({
   buffer,
   base64
 }) {
-  const response = await fetch(`https://api.createanything.com/v0/upload`, {
+  const response = await fetch(`https://api.anything.com/v0/upload`, {
     method: "POST",
     headers: {
       "Content-Type": buffer ? "application/octet-stream" : "application/json"

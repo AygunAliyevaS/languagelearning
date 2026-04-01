@@ -2,7 +2,6 @@ import fg from 'fast-glob';
 import type { Route } from './+types/not-found';
 import { useNavigate } from 'react-router';
 import { useCallback, useEffect, useState } from 'react';
-import { useI18n } from '@/lib/language-context';
 
 export async function loader({ params }: Route.LoaderArgs) {
   const matches = await fg('src/**/page.{js,jsx,ts,tsx}');
@@ -33,7 +32,6 @@ export default function CreateDefaultNotFoundPage({
 }: {
   loaderData: Awaited<ReturnType<typeof loader>>;
 }) {
-  const { t } = useI18n();
   const [siteMap, setSitemap] = useState<ParentSitemap | null>(null);
   const navigate = useNavigate();
 
@@ -63,10 +61,6 @@ export default function CreateDefaultNotFoundPage({
   const existingRoutes = loaderData.pages.map((page) => ({
     path: page.path,
     url: page.url,
-  }));
-  const localizedRoutes = existingRoutes.map((route) => ({
-    ...route,
-    path: route.path === 'Homepage' ? t('notFound.homepage') : route.path,
   }));
 
   const handleBack = () => {
@@ -107,7 +101,7 @@ export default function CreateDefaultNotFoundPage({
             viewBox="0 0 18 18"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            aria-label={t('notFound.back')}
+            aria-label="Back"
             role="img"
           >
             <path
@@ -144,19 +138,20 @@ export default function CreateDefaultNotFoundPage({
 
       <div className="flex flex-grow flex-col items-center justify-center pt-[100px] text-center gap-[20px]">
         <h1 className="text-4xl font-medium text-gray-900 px-2">
-          {t('notFound.title')}
+          Uh-oh! This page doesn't exist (yet).
         </h1>
 
         <p className="pt-4 pb-12 px-2 text-gray-500">
-          {t('notFound.subtitle', { path: missingPath })}
+          Looks like "<span className="font-bold">/{missingPath}</span>" isn't part of your project.
+          But no worries, you've got options!
         </p>
 
         <div className="px-[20px] w-full">
           <div className="flex flex-row justify-center items-center w-full max-w-[800px] mx-auto border border-gray-200 rounded-lg p-[20px] mb-[40px] gap-[20px]">
             <div className="flex flex-col gap-[5px] items-start self-start w-1/2">
-              <p className="text-sm text-black text-left">{t('notFound.buildFromScratch')}</p>
+              <p className="text-sm text-black text-left">Build it from scratch</p>
               <p className="text-sm text-gray-500 text-left">
-                {t('notFound.createPageDescription', { path: missingPath })}
+                Create a new page to live at "<span>/{missingPath}</span>"
               </p>
             </div>
             <div className="flex flex-row items-center justify-end w-1/2">
@@ -165,7 +160,7 @@ export default function CreateDefaultNotFoundPage({
                 className="bg-black text-white px-[10px] py-[5px] rounded-md"
                 onClick={() => handleCreatePage()}
               >
-                {t('notFound.createPage')}
+                Create Page
               </button>
             </div>
           </div>
@@ -173,14 +168,14 @@ export default function CreateDefaultNotFoundPage({
 
         <div className="pb-20 lg:pb-[80px]">
           <p className="flex items-center text-gray-500">
-            {t('notFound.routesHint')}
+            Check out all your project's routes here ↓
           </p>
         </div>
 
         {siteMap ? (
           <div className="flex flex-col justify-center items-center w-full px-[50px]">
             <div className="flex flex-col justify-between items-center w-full max-w-[600px] gap-[10px]">
-              <p className="text-sm text-gray-300 pb-[10px] self-start p-4">{t('notFound.pages')}</p>
+              <p className="text-sm text-gray-300 pb-[10px] self-start p-4">PAGES</p>
               {siteMap.webPages?.map((route) => (
                 <button
                   type="button"
@@ -196,7 +191,7 @@ export default function CreateDefaultNotFoundPage({
           </div>
         ) : (
           <div className="flex flex-wrap gap-3 w-full max-w-[80rem] mx-auto pb-5 px-2">
-            {localizedRoutes.map((route) => (
+            {existingRoutes.map((route) => (
               <div
                 key={route.path}
                 className="flex flex-col flex-grow basis-full sm:basis-[calc(50%-0.375rem)] xl:basis-[calc(33.333%-0.5rem)]"

@@ -6,7 +6,7 @@ import { authHandler, initAuthConfig } from '@hono/auth-js';
 import { Pool, neonConfig } from '@neondatabase/serverless';
 import { hash, verify } from 'argon2';
 import { Hono } from 'hono';
-import { contextStorage } from 'hono/context-storage';
+import { contextStorage, getContext } from 'hono/context-storage';
 import { cors } from 'hono/cors';
 import { proxy } from 'hono/proxy';
 import { bodyLimit } from 'hono/body-limit';
@@ -17,8 +17,13 @@ import ws from 'ws';
 import NeonAdapter from './adapter';
 import { getHTMLForErrorPage } from './get-html-for-error-page';
 import { isAuthAction } from './is-auth-action';
-import { API_BASENAME, api, routesReady } from './route-builder';
+import { API_BASENAME, api } from './route-builder';
 neonConfig.webSocketConstructor = ws;
+
+const authSecret = process.env.AUTH_SECRET ?? (import.meta.env.DEV ? 'dev-auth-secret' : undefined);
+const authUrl = process.env.AUTH_URL ?? (import.meta.env.DEV ? 'http://localhost:4000' : undefined);
+const useSecureAuthCookies = authUrl?.startsWith('https') ?? false;
+const authCookieSameSite = useSecureAuthCookies ? 'none' : 'lax';
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
 
@@ -84,14 +89,12 @@ for (const method of ['post', 'put', 'patch'] as const) {
   );
 }
 
-if (process.env.AUTH_SECRET) {
+if (authSecret) {
   app.use(
     '*',
-    initAuthConfig(() => {
-      const isSecureAuth = process.env.AUTH_URL?.startsWith('https') ?? false;
-
-      return {
-      secret: process.env.AUTH_SECRET,
+    initAuthConfig((c) => ({
+      secret: authSecret,
+      basePath: '/api/auth',
       trustHost: true,
       pages: {
         signIn: '/account/signin',
@@ -112,20 +115,20 @@ if (process.env.AUTH_SECRET) {
       cookies: {
         csrfToken: {
           options: {
-            secure: isSecureAuth,
-            sameSite: isSecureAuth ? 'none' : 'lax',
+            secure: useSecureAuthCookies,
+            sameSite: authCookieSameSite,
           },
         },
         sessionToken: {
           options: {
-            secure: isSecureAuth,
-            sameSite: isSecureAuth ? 'none' : 'lax',
+            secure: useSecureAuthCookies,
+            sameSite: authCookieSameSite,
           },
         },
         callbackUrl: {
           options: {
-            secure: isSecureAuth,
-            sameSite: isSecureAuth ? 'none' : 'lax',
+            secure: useSecureAuthCookies,
+            sameSite: authCookieSameSite,
           },
         },
       },
@@ -202,7 +205,6 @@ if (process.env.AUTH_SECRET) {
             const user = await adapter.getUserByEmail(email);
             if (!user) {
               const newUser = await adapter.createUser({
-                id: crypto.randomUUID(),
                 emailVerified: null,
                 email,
                 name: typeof name === 'string' && name.length > 0 ? name : undefined,
@@ -223,8 +225,7 @@ if (process.env.AUTH_SECRET) {
           },
         }),
       ],
-    };
-    })
+    }))
   );
 }
 app.all('/integrations/:path{.+}', async (c, next) => {
@@ -234,8 +235,8 @@ app.all('/integrations/:path{.+}', async (c, next) => {
   return proxy(url, {
     method: c.req.method,
     body: c.req.raw.body ?? null,
-    // @ts-ignore - this key is accepted even if types not aware and is
-    // required for streaming integrations
+    // @ts-expect-error -- duplex is accepted by the runtime even though the
+    // type declarations don't include it; required for streaming integrations
     duplex: 'half',
     redirect: 'manual',
     headers: {
@@ -254,13 +255,9 @@ app.use('/api/auth/*', async (c, next) => {
   }
   return next();
 });
+app.route(API_BASENAME, api);
 
-export default (async () => {
-  await routesReady;
-  app.route(API_BASENAME, api);
-
-  return createHonoServer({
-    app,
-    defaultLogger: false,
-  });
-})();
+export default await createHonoServer({
+  app,
+  defaultLogger: false,
+});
