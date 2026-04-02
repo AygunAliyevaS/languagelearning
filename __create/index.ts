@@ -22,6 +22,7 @@ import { getAuthUrlFromRequest } from '@/utils/auth-url';
 neonConfig.webSocketConstructor = ws;
 
 const authSecret = process.env.AUTH_SECRET ?? (import.meta.env.DEV ? 'dev-auth-secret' : undefined);
+const shouldSkipServerListen = process.env.REACT_ROUTER_HONO_SERVER_SKIP_LISTEN === 'true';
 
 const als = new AsyncLocalStorage<{ requestId: string }>();
 
@@ -261,7 +262,19 @@ app.use('/api/auth/*', async (c, next) => {
 });
 app.route(API_BASENAME, api);
 
-export default await createHonoServer({
+const originalNodeEnv = process.env.NODE_ENV;
+
+if (shouldSkipServerListen) {
+  process.env.NODE_ENV = 'development';
+}
+
+const server = await createHonoServer({
   app,
   defaultLogger: false,
 });
+
+if (shouldSkipServerListen) {
+  process.env.NODE_ENV = originalNodeEnv;
+}
+
+export default server;

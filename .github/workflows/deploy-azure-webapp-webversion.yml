@@ -40,6 +40,8 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          REACT_ROUTER_HONO_SERVER_SKIP_LISTEN: 'true'
 
       - name: Prepare deployment package
         shell: bash
