@@ -79,6 +79,31 @@ jobs:
               HOST="0.0.0.0" \
               SCM_DO_BUILD_DURING_DEPLOYMENT="true"
 
+      - name: Ensure Azure Web App is running
+        shell: bash
+        run: |
+          az webapp start \
+            --name "${{ env.AZURE_WEBAPP_NAME }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}"
+
+          for attempt in 1 2 3 4 5 6; do
+            app_state=$(az webapp show \
+              --name "${{ env.AZURE_WEBAPP_NAME }}" \
+              --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+              --query state \
+              --output tsv)
+
+            if [ "$app_state" = "Running" ]; then
+              exit 0
+            fi
+
+            echo "Azure web app state is '$app_state' on attempt $attempt. Waiting for it to start..."
+            sleep 10
+          done
+
+          echo "Azure web app did not reach the Running state before deployment." >&2
+          exit 1
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
