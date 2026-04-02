@@ -49,6 +49,39 @@ if (globalThis.window && globalThis.window !== undefined) {
 }
 
 const LoadFontsSSR = import.meta.env.SSR ? LoadFonts : null;
+const preHydrationCleanupScript = `(function () {
+  var selectors = ['wordtune-spices-nudge'];
+  var removeInjectedNodes = function () {
+    for (var index = 0; index < selectors.length; index += 1) {
+      var nodes = document.querySelectorAll(selectors[index]);
+      for (var nodeIndex = 0; nodeIndex < nodes.length; nodeIndex += 1) {
+        nodes[nodeIndex].remove();
+      }
+    }
+  };
+
+  removeInjectedNodes();
+
+  var observer = new MutationObserver(function () {
+    removeInjectedNodes();
+  });
+
+  if (document.documentElement) {
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+  }
+
+  window.addEventListener(
+    'load',
+    function () {
+      removeInjectedNodes();
+      window.setTimeout(function () {
+        observer.disconnect();
+      }, 3000);
+    },
+    { once: true }
+  );
+})();`;
+
 if (import.meta.hot) {
   import.meta.hot.on('update-font-links', (urls: string[]) => {
     // remove old font links
@@ -462,6 +495,7 @@ export function Layout({ children }: { children: ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <script dangerouslySetInnerHTML={{ __html: preHydrationCleanupScript }} />
         <Meta />
         <Links />
         <script type="module" src="/src/__create/dev-error-overlay.js"></script>
