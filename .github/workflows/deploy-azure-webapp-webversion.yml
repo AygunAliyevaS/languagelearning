@@ -55,6 +55,7 @@ jobs:
           if [ -d public ]; then
             cp -R public release/public
           fi
+          (cd release && zip -r ../release.zip .)
 
       - name: Azure login
         uses: azure/login@v3
@@ -113,10 +114,15 @@ jobs:
           exit 1
 
       - name: Deploy to Azure Web App
-        uses: azure/webapps-deploy@v3
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          package: ./release
+        shell: bash
+        run: |
+          az webapp deploy \
+            --name "${{ env.AZURE_WEBAPP_NAME }}" \
+            --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
+            --src-path ./release.zip \
+            --type zip \
+            --clean true \
+            --restart true
 
       - name: Verify Azure startup command
         shell: bash
