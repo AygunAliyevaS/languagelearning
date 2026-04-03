@@ -1,6 +1,5 @@
 import { getToken } from '@auth/core/jwt';
 import { isSecureAuthRequest } from '@/utils/auth-url';
-
 export async function GET(request) {
 	const secureCookie = isSecureAuthRequest(request);
 	const [token, jwt] = await Promise.all([
@@ -20,6 +19,7 @@ export async function GET(request) {
 	if (!jwt) {
 		return new Response(
 			`
+			<!DOCTYPE html>
 			<html>
 				<body>
 					<script>
@@ -49,6 +49,7 @@ export async function GET(request) {
 
 	return new Response(
 		`
+		<!DOCTYPE html>
 		<html>
 			<body>
 				<script>

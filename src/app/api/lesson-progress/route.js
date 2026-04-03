@@ -1,4 +1,5 @@
 import sql from '@/app/api/utils/sql';
+import { enforceLearningActivityAccess } from '@/app/api/utils/freemium';
 import { awardUserActivity } from '@/app/api/utils/user-progress';
 
 function toPositiveInteger(value) {
@@ -47,6 +48,22 @@ export async function POST(request) {
   }
 
   try {
+    const lessonRows = await sql`
+      SELECT level_code
+      FROM lessons
+      WHERE id = ${lessonId}
+      LIMIT 1
+    `;
+    const access = await enforceLearningActivityAccess({
+      userId,
+      activityType: 'lesson',
+      levelCode: lessonRows[0]?.level_code ?? '',
+    });
+
+    if (!access.allowed) {
+      return Response.json(access.payload, { status: access.status });
+    }
+
     const result = await sql`
       INSERT INTO lesson_progress (
         user_id,

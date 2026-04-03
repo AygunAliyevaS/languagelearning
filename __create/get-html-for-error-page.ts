@@ -2,6 +2,7 @@ import { serializeError } from 'serialize-error';
 
 export const getHTMLForErrorPage = (err: unknown): string => {
   return `
+<!DOCTYPE html>
 <html>
   <head>
     <script>

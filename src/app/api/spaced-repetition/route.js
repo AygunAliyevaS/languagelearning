@@ -1,4 +1,5 @@
 import sql from "@/app/api/utils/sql";
+import { enforceLearningActivityAccess } from '@/app/api/utils/freemium';
 import { awardUserActivity } from '@/app/api/utils/user-progress';
 
 export async function GET(request) {
@@ -26,8 +27,25 @@ export async function POST(request) {
   const body = await request.json();
   const { userId, wordId, quality } = body; // quality 0-5
 
+  if (!userId || !wordId || !Number.isInteger(quality) || quality < 0 || quality > 5) {
+    return Response.json(
+      { error: 'userId, wordId, and a quality score between 0 and 5 are required.' },
+      { status: 400 }
+    );
+  }
+
   // SM-2 Algorithm implementation
   try {
+    const access = await enforceLearningActivityAccess({
+      userId,
+      activityType: 'review',
+      levelCode: 'A2',
+    });
+
+    if (!access.allowed) {
+      return Response.json(access.payload, { status: access.status });
+    }
+
     const current =
       await sql`SELECT * FROM spaced_repetition WHERE user_id = ${userId} AND word_id = ${wordId} LIMIT 1`;
 

@@ -35,6 +35,7 @@ import { Toaster, toast } from 'sonner';
 import { useDevServerHeartbeat } from '../__create/useDevServerHeartbeat';
 import { DEFAULT_LOCALE, readLocaleFromCookie } from './lib/i18n.js';
 import type { Route } from './+types/root';
+import faviconUrl from '../__create/favicon.png';
 
 export const links = () => [];
 
@@ -49,6 +50,7 @@ if (globalThis.window && globalThis.window !== undefined) {
 }
 
 const LoadFontsSSR = import.meta.env.SSR ? LoadFonts : null;
+const devErrorOverlayUrl = import.meta.env.DEV ? '/src/__create/dev-error-overlay.js' : null;
 const preHydrationCleanupScript = `(function () {
   var selectors = ['wordtune-spices-nudge'];
   var removeInjectedNodes = function () {
@@ -498,8 +500,8 @@ export function Layout({ children }: { children: ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: preHydrationCleanupScript }} />
         <Meta />
         <Links />
-        <script type="module" src="/src/__create/dev-error-overlay.js"></script>
-        <link rel="icon" href="/src/__create/favicon.png" />
+        {devErrorOverlayUrl ? <script type="module" src={devErrorOverlayUrl}></script> : null}
+        <link rel="icon" href={faviconUrl} />
         {LoadFontsSSR ? <LoadFontsSSR /> : null}
       </head>
       <body suppressHydrationWarning>

@@ -39,6 +39,7 @@ CREATE TABLE IF NOT EXISTS users (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   username TEXT NOT NULL,
   email TEXT NOT NULL UNIQUE,
+  role TEXT NOT NULL DEFAULT 'learner',
   xp INTEGER NOT NULL DEFAULT 0,
   streak INTEGER NOT NULL DEFAULT 0,
   cefr_level TEXT,
@@ -143,6 +144,9 @@ CREATE INDEX IF NOT EXISTS culture_entries_category_order_idx
 ALTER TABLE users
   ADD COLUMN IF NOT EXISTS locale TEXT NOT NULL DEFAULT 'en';
 
+ALTER TABLE users
+  ADD COLUMN IF NOT EXISTS role TEXT NOT NULL DEFAULT 'learner';
+
 ALTER TABLE lessons
   ADD COLUMN IF NOT EXISTS title_translations JSONB NOT NULL DEFAULT '{}'::jsonb;
 
@@ -212,6 +216,30 @@ CREATE TABLE IF NOT EXISTS auth_verification_token (
   token TEXT NOT NULL UNIQUE,
   PRIMARY KEY (identifier, token)
 );
+
+CREATE TABLE IF NOT EXISTS support_tickets (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  ticket_number TEXT NOT NULL UNIQUE,
+  requester_name TEXT NOT NULL,
+  requester_email TEXT NOT NULL,
+  user_id TEXT,
+  category TEXT NOT NULL DEFAULT 'general',
+  subject TEXT NOT NULL,
+  message TEXT NOT NULL,
+  status TEXT NOT NULL DEFAULT 'open',
+  source_path TEXT,
+  metadata JSONB NOT NULL DEFAULT '{}'::jsonb,
+  first_response_at TIMESTAMPTZ,
+  resolved_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE INDEX IF NOT EXISTS support_tickets_email_created_idx
+  ON support_tickets (requester_email, created_at DESC);
+
+CREATE INDEX IF NOT EXISTS support_tickets_status_created_idx
+  ON support_tickets (status, created_at DESC);
 `;
 
 try {

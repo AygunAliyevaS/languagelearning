@@ -7,11 +7,15 @@ import {
   Flame,
   Globe2,
   Home,
+  LifeBuoy,
   Medal,
   NotebookPen,
+  ShoppingBag,
+  ShieldCheck,
   Star,
   Trophy,
   UserRound,
+  Volume2,
 } from 'lucide-react';
 import { useDeferredValue, useEffect, useMemo, useState } from 'react';
 import {
@@ -35,18 +39,24 @@ import {
   supportedLocales,
   t,
 } from '@/app/lib/i18n.js';
+import { getCatalogProduct } from '@/app/lib/monetization';
+import { SUPPORT_EMAIL } from '@/app/lib/support';
+import { DEMO_EMAIL, isAdminRole } from '@/app/lib/user';
 
-const demoEmail = 'demo@azdili.local';
+const demoEmail = DEMO_EMAIL;
 const dailyXpGoal = 50;
 const tabBlueprint = [
   { id: 'home', icon: Home },
   { id: 'lessons', icon: BookOpen },
   { id: 'practice', icon: NotebookPen },
   { id: 'culture', icon: Globe2 },
+  { id: 'leaderboard', icon: Trophy },
   { id: 'stats', icon: BarChart3 },
+  { id: 'shop', icon: ShoppingBag },
   { id: 'profile', icon: UserRound },
 ];
 const lessonExerciseTypes = new Set(['quiz', 'textInput', 'match']);
+const leaderboardPeriodFilters = ['all-time', 'weekly', 'monthly'];
 const statsActivityFilters = ['all', 'lessons', 'reviews'];
 const statsReviewQualityFilters = ['all', '3', '4', '5'];
 const statsRangeFilters = ['7', '30', '90'];
@@ -130,6 +140,44 @@ function getLessonAccuracy(progress) {
   return Math.round((progress.best_score / progress.total_exercises) * 100);
 }
 
+function getExamPrepProductSlugForLevel(levelCode) {
+  const normalizedLevelCode = String(levelCode ?? '').trim().toUpperCase();
+
+  if (normalizedLevelCode === 'A1' || normalizedLevelCode === 'A2') {
+    return 'exam-prep-a2';
+  }
+
+  if (normalizedLevelCode === 'B1' || normalizedLevelCode === 'B2') {
+    return 'exam-prep-b1';
+  }
+
+  if (normalizedLevelCode === 'C1' || normalizedLevelCode === 'C2') {
+    return 'exam-prep-c1';
+  }
+
+  return null;
+}
+
+function getLessonCompletionOffer(lesson, ownedSlugs) {
+  const productSlug = getExamPrepProductSlugForLevel(lesson?.level_code);
+
+  if (!productSlug) {
+    return null;
+  }
+
+  const product = getCatalogProduct(productSlug);
+
+  if (!product) {
+    return null;
+  }
+
+  return {
+    ...product,
+    owned: ownedSlugs.includes(productSlug),
+    recommendedForLevel: lesson?.level_code ?? product.metadata?.levelCode ?? '',
+  };
+}
+
 function QuickAction({ icon: Icon, label, active, onClick, tint }) {
   return (
     <button
@@ -158,6 +206,100 @@ function HomeCard({ title, subtitle, gradient, icon: Icon, onClick }) {
       <div>
         <p className="text-[16px] font-semibold leading-5">{title}</p>
         <p className="mt-1 text-[12px] text-white/90">{subtitle}</p>
+      </div>
+    </button>
+  );
+}
+
+function ShopProductCard({ product, locale, onUnlock, isUnlocking, canPurchase }) {
+  const accessUntil = product.access?.expiresAt
+    ? new Date(product.access.expiresAt).toLocaleDateString(locale, { month: 'short', day: 'numeric', year: 'numeric' })
+    : null;
+
+  return (
+    <article className="rounded-[22px] border border-slate-200 bg-white px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{product.priceLabel}</p>
+          <h3 className="mt-2 text-[18px] font-semibold tracking-tight text-slate-950">
+            {getLocalizedText(locale, product.title)}
+          </h3>
+          <p className="mt-2 text-[13px] leading-6 text-slate-600">{getLocalizedText(locale, product.description)}</p>
+        </div>
+        {product.owned ? (
+          <span className="rounded-full bg-[#ecfdf5] px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#059669]">
+            {t(locale, 'shop.owned')}
+          </span>
+        ) : null}
+      </div>
+
+      <div className="mt-4 flex flex-wrap gap-2">
+        <span className="rounded-full bg-[#fff4ea] px-3 py-1.5 text-[12px] font-semibold text-[#c45a00]">
+          {t(locale, 'shop.validity')}: {getLocalizedText(locale, product.validityLabel)}
+        </span>
+        {accessUntil ? (
+          <span className="rounded-full bg-slate-100 px-3 py-1.5 text-[12px] font-semibold text-slate-600">
+            {t(locale, 'shop.accessUntil', { date: accessUntil })}
+          </span>
+        ) : null}
+      </div>
+
+      <div className="mt-4 space-y-2">
+        {(product.highlights ?? []).map((highlight, index) => (
+          <div key={`${product.slug}-highlight-${index}`} className="flex gap-3 text-[13px] leading-6 text-slate-600">
+            <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#ff8b26]" />
+            <span>{getLocalizedText(locale, highlight)}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-5 flex items-center justify-between gap-3">
+        <p className="text-[20px] font-semibold tracking-tight text-slate-950">{product.priceLabel}</p>
+        <button
+          type="button"
+          disabled={product.owned || isUnlocking || !canPurchase}
+          onClick={() => onUnlock(product.slug)}
+          className="rounded-[16px] bg-[#ff8b26] px-4 py-3 text-[13px] font-semibold text-white transition hover:bg-[#f97316] disabled:cursor-not-allowed disabled:bg-slate-300"
+        >
+          {product.owned
+            ? t(locale, 'shop.owned')
+            : isUnlocking
+              ? t(locale, 'shop.unlocking')
+              : canPurchase
+                ? t(locale, 'shop.unlockNow')
+                : t(locale, 'shop.unavailable')}
+        </button>
+      </div>
+    </article>
+  );
+}
+
+function ExamPrepPackCard({ item, locale, active, onSelect }) {
+  return (
+    <button
+      type="button"
+      onClick={onSelect}
+      className={[
+        'w-full rounded-[20px] border px-4 py-4 text-left transition',
+        active
+          ? 'border-[#ff8b26] bg-[#fff4ea] shadow-[0_12px_28px_rgba(255,139,38,0.15)]'
+          : 'border-slate-200 bg-white hover:border-[#ffcf9e]',
+      ].join(' ')}
+    >
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{item.levelCode}</p>
+          <h3 className="mt-2 text-[17px] font-semibold tracking-tight text-slate-950">{getLocalizedText(locale, item.title)}</h3>
+          <p className="mt-2 text-[13px] leading-6 text-slate-600">{getLocalizedText(locale, item.overview)}</p>
+        </div>
+        <span
+          className={[
+            'rounded-full px-3 py-1.5 text-[11px] font-semibold uppercase tracking-[0.12em]',
+            item.access ? 'bg-[#ecfdf5] text-[#059669]' : 'bg-slate-100 text-slate-500',
+          ].join(' ')}
+        >
+          {item.access ? t(locale, 'shop.owned') : t(locale, 'shop.studioLocked')}
+        </span>
       </div>
     </button>
   );
@@ -221,6 +363,15 @@ function SectionBlock({ section, locale }) {
       {section.prompt ? (
         <p className="mt-2 text-[13px] leading-6 text-slate-600">{getLocalizedText(locale, section.prompt)}</p>
       ) : null}
+      {section.audioUrl ? (
+        <div className="mt-3 rounded-[14px] border border-[#fde6cc] bg-white px-3 py-3">
+          <div className="mb-2 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.18em] text-[#ff8b26]">
+            <Volume2 className="h-4 w-4" />
+            Audio
+          </div>
+          <audio controls preload="none" className="w-full" src={section.audioUrl} />
+        </div>
+      ) : null}
       {Array.isArray(section.items) ? (
         <div className="mt-3 space-y-2">
           {section.items.map((item, index) => (
@@ -262,6 +413,16 @@ function Flashcard({ card, flipped, onFlip, onRate, disabled, labels, locale }) 
           {flipped ? labels.flipBack : labels.flipForward}
         </p>
       </button>
+
+      {card.pronunciation_url ? (
+        <div className="rounded-[18px] border border-[#ebedf2] bg-white px-4 py-3 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+          <div className="mb-2 flex items-center gap-2 text-[12px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+            <Volume2 className="h-4 w-4 text-[#ff8b26]" />
+            Pronunciation
+          </div>
+          <audio controls preload="none" className="w-full" src={card.pronunciation_url} />
+        </div>
+      ) : null}
 
       <div className="grid grid-cols-3 gap-2">
         {[0, 1, 2, 3, 4, 5].map((quality) => (
@@ -316,6 +477,47 @@ function ActivityBars({ items, emptyLabel }) {
           {item.meta ? <p className="mt-2 text-[12px] leading-5 text-slate-500">{item.meta}</p> : null}
         </div>
       ))}
+    </div>
+  );
+}
+
+function LeaderboardRow({ entry, isCurrentUser, locale }) {
+  const displayName = entry?.username || entry?.email || t(locale, 'leaderboard.learnerFallback');
+  const rankToneClassName =
+    entry?.rank === 1 ? 'bg-amber-100 text-amber-700' : entry?.rank <= 3 ? 'bg-slate-200 text-slate-800' : 'bg-slate-100 text-slate-600';
+
+  return (
+    <div
+      className={[
+        'flex items-center gap-3 rounded-[18px] border px-4 py-4',
+        isCurrentUser ? 'border-[#ffcf9e] bg-[#fff7ed]' : 'border-slate-200 bg-white',
+      ].join(' ')}
+    >
+      <div className={`flex h-10 w-10 items-center justify-center rounded-full text-[14px] font-semibold ${rankToneClassName}`}>
+        {entry.rank === 1 ? <Crown className="h-4 w-4" strokeWidth={2.2} /> : entry.rank}
+      </div>
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <p className="truncate text-[15px] font-semibold text-slate-950">{displayName}</p>
+          {isCurrentUser ? (
+            <span className="rounded-full bg-slate-950 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white">
+              {t(locale, 'leaderboard.you')}
+            </span>
+          ) : null}
+        </div>
+        <p className="mt-1 text-[12px] text-slate-500">
+          {t(locale, 'leaderboard.rowMeta', {
+            completed: entry.completed_lessons ?? 0,
+            accuracy: entry.lesson_accuracy ?? 0,
+          })}
+        </p>
+      </div>
+      <div className="text-right">
+        <p className="text-[18px] font-semibold tracking-tight text-slate-950">{entry.xp ?? 0}</p>
+        <p className="mt-1 text-[12px] text-slate-500">
+          {entry.streak ?? 0} {t(locale, 'leaderboard.streakShort')}
+        </p>
+      </div>
     </div>
   );
 }
@@ -640,7 +842,15 @@ function LanguageModal({ isOpen, locale, onClose, onSelect }) {
   );
 }
 
-function LessonExerciseLab({ lesson, locale, onComplete, savedProgress, isSavingProgress }) {
+function LessonExerciseLab({
+  lesson,
+  locale,
+  onComplete,
+  savedProgress,
+  isSavingProgress,
+  completionOffer,
+  onSelectCompletionOffer,
+}) {
   const exercises = useMemo(() => getLessonExercises(lesson), [lesson]);
   const [exerciseIndex, setExerciseIndex] = useState(0);
   const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
@@ -810,6 +1020,42 @@ function LessonExerciseLab({ lesson, locale, onComplete, savedProgress, isSaving
                 {savedProgress.attempts_count} · {savedAccuracy}%
               </p>
             </div>
+          </div>
+        ) : null}
+        {completionOffer ? (
+          <div className="mt-4 rounded-[18px] border border-[#fde6cc] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-[#c45a00]">
+              {t(locale, 'lessons.recommendedPack')}
+            </p>
+            <div className="mt-2 flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+              <div className="max-w-[34rem]">
+                <h5 className="text-[18px] font-semibold tracking-tight text-slate-950">
+                  {getLocalizedText(locale, completionOffer.title)}
+                </h5>
+                <p className="mt-2 text-[13px] leading-6 text-slate-600">
+                  {completionOffer.owned
+                    ? t(locale, 'lessons.recommendedPackOwnedCopy', {
+                        pack: getLocalizedText(locale, completionOffer.title),
+                      })
+                    : t(locale, 'lessons.recommendedPackCopy', {
+                        level: completionOffer.recommendedForLevel,
+                        pack: getLocalizedText(locale, completionOffer.title),
+                      })}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => onSelectCompletionOffer?.(completionOffer.slug)}
+                className="rounded-[16px] bg-slate-950 px-4 py-3 text-[13px] font-semibold text-white transition hover:bg-slate-800"
+              >
+                {completionOffer.owned ? t(locale, 'lessons.openPack') : t(locale, 'lessons.viewPack')}
+              </button>
+            </div>
+            {!completionOffer.owned ? (
+              <p className="mt-3 text-[12px] font-medium text-slate-500">
+                {completionOffer.priceLabel} · {getLocalizedText(locale, completionOffer.validityLabel)}
+              </p>
+            ) : null}
           </div>
         ) : null}
         {isSavingProgress ? (
@@ -1006,6 +1252,7 @@ function LessonExerciseLab({ lesson, locale, onComplete, savedProgress, isSaving
 export default function Page() {
   const [activeTab, setActiveTab] = useState('home');
   const [locale, setLocale] = useState(DEFAULT_LOCALE);
+  const [leaderboardPeriod, setLeaderboardPeriod] = useState('all-time');
   const [statsRangeFilter, setStatsRangeFilter] = useState('7');
   const [statsLevelFilter, setStatsLevelFilter] = useState('all');
   const [statsActivityFilter, setStatsActivityFilter] = useState('all');
@@ -1020,6 +1267,23 @@ export default function Page() {
   const [vocabulary, setVocabulary] = useState([]);
   const [cultureCategories, setCultureCategories] = useState([]);
   const [reviews, setReviews] = useState([]);
+  const [leaderboardState, setLeaderboardState] = useState({
+    entries: [],
+    currentUserEntry: null,
+    totalUsers: 0,
+    loading: true,
+    error: null,
+  });
+  const [examPrepState, setExamPrepState] = useState({ items: [], loading: true, error: null, selectedSlug: null });
+  const [shopState, setShopState] = useState({
+    sections: [],
+    ownedSlugs: [],
+    checkoutMode: 'catalog-only',
+    loading: true,
+    error: null,
+    notice: null,
+    purchasingSlug: null,
+  });
   const [selectedLessonId, setSelectedLessonId] = useState(null);
   const [selectedCultureCategoryId, setSelectedCultureCategoryId] = useState(null);
   const [selectedCultureEntryId, setSelectedCultureEntryId] = useState(null);
@@ -1038,10 +1302,39 @@ export default function Page() {
     return window.localStorage.getItem(LANGUAGE_STORAGE_KEY);
   }
 
+  function readUrlState() {
+    if (typeof window === 'undefined') {
+      return { activeTab: null, checkout: null, sessionId: null };
+    }
+
+    const searchParams = new URLSearchParams(window.location.search);
+    return {
+      activeTab: searchParams.get('tab'),
+      checkout: searchParams.get('checkout'),
+      sessionId: searchParams.get('session_id'),
+    };
+  }
+
+  function clearCheckoutQueryParams() {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const url = new URL(window.location.href);
+    url.searchParams.delete('checkout');
+    url.searchParams.delete('session_id');
+    url.searchParams.delete('product');
+    window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+  }
+
   useEffect(() => {
     const storedLocale = readStoredLocale();
+    const urlState = readUrlState();
     if (storedLocale) {
       setLocale(resolveLocale(storedLocale));
+    }
+    if (urlState.activeTab && tabBlueprint.some((tab) => tab.id === urlState.activeTab)) {
+      setActiveTab(urlState.activeTab);
     }
   }, []);
 
@@ -1177,6 +1470,259 @@ export default function Page() {
   }, [statsActivityFilter, statsLevelFilter, statsRangeFilter, statsReviewQualityFilter, status.loading, user?.id]);
 
   useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadShopCatalog() {
+      setShopState((current) => ({ ...current, loading: true, error: null }));
+
+      try {
+        const query = buildQueryString({ action: 'available', userId: user.id });
+        const response = await fetch(`/api/purchases${query}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to load the shop catalog.');
+        }
+
+        const payload = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        setShopState((current) => ({
+          ...current,
+          sections: Array.isArray(payload?.sections) ? payload.sections : [],
+          ownedSlugs: Array.isArray(payload?.ownedSlugs) ? payload.ownedSlugs : [],
+          checkoutMode: payload?.checkoutMode ?? 'catalog-only',
+          loading: false,
+          error: null,
+        }));
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setShopState((current) => ({
+          ...current,
+          loading: false,
+          error: error instanceof Error ? error.message : 'Failed to load the shop catalog.',
+        }));
+      }
+    }
+
+    loadShopCatalog();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadLeaderboard() {
+      setLeaderboardState((current) => ({ ...current, loading: true, error: null }));
+
+      try {
+        const query = buildQueryString({ userId: user.id, limit: 20, period: leaderboardPeriod });
+        const response = await fetch(`/api/leaderboard${query}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to load leaderboard.');
+        }
+
+        const payload = await response.json();
+
+        if (cancelled) {
+          return;
+        }
+
+        setLeaderboardState({
+          entries: Array.isArray(payload?.entries) ? payload.entries : [],
+          currentUserEntry: payload?.currentUserEntry ?? null,
+          totalUsers: Number(payload?.totalUsers ?? 0),
+          loading: false,
+          error: null,
+        });
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setLeaderboardState((current) => ({
+          ...current,
+          loading: false,
+          error: error instanceof Error ? error.message : 'Failed to load leaderboard.',
+        }));
+      }
+    }
+
+    loadLeaderboard();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [leaderboardPeriod, user?.id, user?.xp, user?.streak, lessonProgress.length, reviewActivity.length]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function loadExamPrepStudio() {
+      setExamPrepState((current) => ({ ...current, loading: true, error: null }));
+
+      try {
+        const query = buildQueryString({ userId: user.id });
+        const response = await fetch(`/api/exam-prep${query}`);
+
+        if (!response.ok) {
+          throw new Error('Failed to load exam prep packs.');
+        }
+
+        const payload = await response.json();
+        const items = Array.isArray(payload?.items) ? payload.items : [];
+        const firstOwned = items.find((item) => item.access)?.productSlug ?? null;
+
+        if (cancelled) {
+          return;
+        }
+
+        setExamPrepState((current) => ({
+          ...current,
+          items,
+          loading: false,
+          error: null,
+          selectedSlug:
+            current.selectedSlug && items.some((item) => item.productSlug === current.selectedSlug)
+              ? current.selectedSlug
+              : firstOwned ?? items[0]?.productSlug ?? null,
+        }));
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setExamPrepState((current) => ({
+          ...current,
+          loading: false,
+          error: error instanceof Error ? error.message : 'Failed to load exam prep packs.',
+        }));
+      }
+    }
+
+    loadExamPrepStudio();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user?.id) {
+      return;
+    }
+
+    const urlState = readUrlState();
+
+    if (urlState.checkout === 'cancel') {
+      setActiveTab('shop');
+      setShopState((current) => ({
+        ...current,
+        notice: t(locale, 'shop.checkoutCancelled'),
+      }));
+      clearCheckoutQueryParams();
+      return;
+    }
+
+    if (urlState.checkout !== 'success' || !urlState.sessionId) {
+      return;
+    }
+
+    let cancelled = false;
+
+    async function confirmCheckout() {
+      setActiveTab('shop');
+      setShopState((current) => ({
+        ...current,
+        purchasingSlug: null,
+        error: null,
+        notice: null,
+      }));
+
+      try {
+        const query = buildQueryString({ action: 'confirm-checkout', userId: user.id, sessionId: urlState.sessionId });
+        const response = await fetch(`/api/purchases${query}`);
+        const payload = await response.json();
+
+        if (!response.ok) {
+          throw new Error(payload?.error ?? t(locale, 'shop.checkoutError'));
+        }
+
+        if (cancelled) {
+          return;
+        }
+
+        setShopState((current) => ({
+          ...current,
+          sections: Array.isArray(payload?.catalog?.sections) ? payload.catalog.sections : current.sections,
+          ownedSlugs: Array.isArray(payload?.catalog?.ownedSlugs) ? payload.catalog.ownedSlugs : current.ownedSlugs,
+          checkoutMode: payload?.checkoutMode ?? current.checkoutMode,
+          notice: payload?.paid ? t(locale, 'shop.checkoutSuccess') : t(locale, 'shop.checkoutPending'),
+          error: null,
+        }));
+
+        if (payload?.paid && payload?.product?.slug) {
+          setExamPrepState((current) => ({
+            ...current,
+            items: current.items.map((item) =>
+              item.productSlug === payload.product.slug
+                ? {
+                    ...item,
+                    access: item.access ?? {
+                      grantedAt: new Date().toISOString(),
+                      expiresAt: payload?.purchase?.expires_at ?? null,
+                      source: payload?.purchase?.source ?? 'stripe',
+                    },
+                  }
+                : item
+            ),
+            selectedSlug: payload.product.slug,
+          }));
+        }
+
+        clearCheckoutQueryParams();
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+
+        setShopState((current) => ({
+          ...current,
+          error: error instanceof Error ? error.message : t(locale, 'shop.checkoutError'),
+          notice: null,
+        }));
+      }
+    }
+
+    confirmCheckout();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [locale, user?.id]);
+
+  useEffect(() => {
     setStatsDrilldown(null);
   }, [statsActivityFilter, statsLevelFilter, statsRangeFilter, statsReviewQualityFilter]);
 
@@ -1276,6 +1822,7 @@ export default function Page() {
   const selectedRangeWeeks = Math.max(1, Math.ceil(selectedRangeDays / 7));
 
   const activeCard = vocabulary[activeCardIndex] ?? null;
+  const canPurchaseFromShop = shopState.checkoutMode === 'prototype-grant' || shopState.checkoutMode === 'stripe-checkout';
   const xp = user?.xp ?? 0;
   const xpProgress = Math.min((xp / dailyXpGoal) * 100, 100);
   const streak = user?.streak ?? reviews.length;
@@ -1286,6 +1833,12 @@ export default function Page() {
       ? Math.round(lessonProgress.reduce((sum, item) => sum + getLessonAccuracy(item), 0) / lessonProgress.length)
       : 0;
   const selectedLessonProgress = selectedLesson ? lessonProgressMap[selectedLesson.id] ?? null : null;
+  const selectedLessonCompletionOffer = useMemo(() => {
+    return getLessonCompletionOffer(selectedLesson, shopState.ownedSlugs);
+  }, [selectedLesson, shopState.ownedSlugs]);
+  const selectedExamPrepPack = useMemo(() => {
+    return examPrepState.items.find((item) => item.productSlug === examPrepState.selectedSlug) ?? examPrepState.items[0] ?? null;
+  }, [examPrepState.items, examPrepState.selectedSlug]);
   const filteredLessonActivity = useMemo(() => {
     return lessonActivity.filter((item) => isActivityInRange(item.completed_at, statsDrilldown));
   }, [lessonActivity, statsDrilldown]);
@@ -1517,11 +2070,18 @@ export default function Page() {
         body: JSON.stringify({ userId: user.id, wordId: activeCard.id, quality }),
       });
 
+      const payload = await response.json().catch(() => null);
+
       if (!response.ok) {
-        throw new Error('Failed to save review');
+        if (payload?.code === 'FREE_TIER_LIMIT_REACHED') {
+          handleFreeTierLimit(payload);
+          setStatus((current) => ({ ...current, savingReview: false, error: null }));
+          return;
+        }
+
+        throw new Error(payload?.error ?? 'Failed to save review');
       }
 
-      const payload = await response.json();
       const savedReview = payload.review ?? payload;
 
       setReviews((current) => {
@@ -1576,11 +2136,17 @@ export default function Page() {
         body: JSON.stringify({ userId: user.id, lessonId, score, totalExercises }),
       });
 
+      const payload = await response.json().catch(() => null);
+
       if (!response.ok) {
-        throw new Error('Failed to save lesson progress');
+        if (payload?.code === 'FREE_TIER_LIMIT_REACHED') {
+          handleFreeTierLimit(payload);
+          return;
+        }
+
+        throw new Error(payload?.error ?? 'Failed to save lesson progress');
       }
 
-      const payload = await response.json();
       const savedProgress = payload.progress ?? payload;
       setLessonProgress((current) => {
         const index = current.findIndex((item) => item.lesson_id === savedProgress.lesson_id);
@@ -1623,6 +2189,117 @@ export default function Page() {
     } finally {
       setSavingLessonId(null);
     }
+  }
+
+  async function handleUnlockProduct(productSlug) {
+    if (!user?.id || !user?.email || !productSlug) {
+      return;
+    }
+
+    setShopState((current) => ({ ...current, purchasingSlug: productSlug, error: null }));
+
+    try {
+      const response = await fetch('/api/purchases?action=purchase', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ userId: user.id, email: user.email, productSlug }),
+      });
+      const payload = await response.json();
+
+      if (!response.ok) {
+        throw new Error(payload?.error ?? 'Failed to unlock product.');
+      }
+
+      setShopState((current) => ({
+        ...current,
+        sections: Array.isArray(payload?.catalog?.sections) ? payload.catalog.sections : current.sections,
+        ownedSlugs: Array.isArray(payload?.catalog?.ownedSlugs) ? payload.catalog.ownedSlugs : current.ownedSlugs,
+        checkoutMode: payload?.catalog?.checkoutMode ?? current.checkoutMode,
+        purchasingSlug: payload?.checkoutUrl ? productSlug : null,
+        error: null,
+        notice: null,
+      }));
+
+      setExamPrepState((current) => ({
+        ...current,
+        items: current.items.map((item) =>
+          item.productSlug === productSlug
+            ? {
+                ...item,
+                access: item.access ?? { grantedAt: new Date().toISOString(), expiresAt: null, source: payload?.checkoutMode ?? 'prototype' },
+              }
+            : item
+        ),
+      }));
+
+      if (payload?.checkoutUrl && typeof window !== 'undefined') {
+        window.location.assign(payload.checkoutUrl);
+        return;
+      }
+
+      setShopState((current) => ({
+        ...current,
+        purchasingSlug: null,
+      }));
+    } catch (error) {
+      setShopState((current) => ({
+        ...current,
+        purchasingSlug: null,
+        error: error instanceof Error ? error.message : 'Failed to unlock product.',
+        notice: null,
+      }));
+    }
+  }
+
+  function handleOpenLessonCompletionOffer(productSlug) {
+    if (!productSlug) {
+      return;
+    }
+
+    const product = getCatalogProduct(productSlug);
+
+    setExamPrepState((current) => ({
+      ...current,
+      selectedSlug: productSlug,
+    }));
+    setShopState((current) => ({
+      ...current,
+      notice: product
+        ? t(locale, 'shop.lessonRecommendation', {
+            pack: getLocalizedText(locale, product.title),
+          })
+        : current.notice,
+      error: null,
+    }));
+    setActiveTab('shop');
+  }
+
+  function handleFreeTierLimit(payload) {
+    const recommendedProductSlug = payload?.recommendedProductSlug ?? 'exam-prep-a2';
+    const product = getCatalogProduct(recommendedProductSlug);
+    const featureLabel = t(locale, `paywall.${payload?.activityType ?? 'lesson'}`);
+
+    setExamPrepState((current) => ({
+      ...current,
+      selectedSlug: recommendedProductSlug,
+    }));
+    setShopState((current) => ({
+      ...current,
+      notice: product
+        ? t(locale, 'shop.freeTierUpgradePrompt', {
+            feature: featureLabel,
+            limit: payload?.limit ?? 0,
+            pack: getLocalizedText(locale, product.title),
+          })
+        : t(locale, 'shop.freeTierUpgradeFallback', {
+            feature: featureLabel,
+            limit: payload?.limit ?? 0,
+          }),
+      error: null,
+      purchasingSlug: null,
+    }));
+    setStatus((current) => ({ ...current, error: null }));
+    setActiveTab('shop');
   }
 
   function renderHome() {
@@ -1682,10 +2359,10 @@ export default function Page() {
               />
               <QuickAction
                 icon={Trophy}
-                label={t(locale, 'home.leaderboard')}
+                label={t(locale, 'tabs.leaderboard')}
                 active
                 tint="bg-[#f3e8ff]"
-                onClick={() => setActiveTab('stats')}
+                onClick={() => setActiveTab('leaderboard')}
               />
               <QuickAction
                 icon={BrainCircuit}
@@ -1739,7 +2416,7 @@ export default function Page() {
                   subtitle={t(locale, 'home.premiumSubtitle')}
                   gradient="bg-[linear-gradient(135deg,#ff9c1a_0%,#ff6b00_100%)]"
                   icon={Crown}
-                  onClick={() => setActiveTab('profile')}
+                  onClick={() => setActiveTab('shop')}
                 />
               </div>
             </section>
@@ -1842,6 +2519,8 @@ export default function Page() {
                 locale={locale}
                 savedProgress={selectedLessonProgress}
                 isSavingProgress={savingLessonId === selectedLesson.id}
+                completionOffer={selectedLessonCompletionOffer}
+                onSelectCompletionOffer={handleOpenLessonCompletionOffer}
                 onComplete={handleLessonCompletion}
               />
             </section>
@@ -2261,6 +2940,269 @@ export default function Page() {
     );
   }
 
+  function renderLeaderboard() {
+    const visibleEntries = leaderboardState.entries;
+    const isCurrentUserVisible = visibleEntries.some((entry) => entry.id === leaderboardState.currentUserEntry?.id);
+    const leaderboardPeriodLabel = t(locale, `leaderboard.periods.${leaderboardPeriod}`);
+
+    return (
+      <div className="space-y-5">
+        <div>
+          <h2 className="text-[20px] font-semibold tracking-tight text-slate-900">{t(locale, 'leaderboard.title')}</h2>
+          <p className="mt-1 text-[13px] text-slate-500">{t(locale, 'leaderboard.subtitle')}</p>
+        </div>
+
+        <section className="overflow-hidden rounded-[24px] bg-[linear-gradient(135deg,#f8fafc_0%,#ffffff_45%,#fff7ed_100%)] px-5 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-400">{leaderboardPeriodLabel}</p>
+              <h3 className="mt-2 text-[26px] font-semibold tracking-tight text-slate-950">{t(locale, 'leaderboard.heroTitle')}</h3>
+              <p className="mt-3 max-w-[34rem] text-[14px] leading-7 text-slate-600">{t(locale, 'leaderboard.heroCopy')}</p>
+            </div>
+            <div className="rounded-[20px] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{t(locale, 'leaderboard.totalLearners')}</p>
+              <p className="mt-2 text-[24px] font-semibold tracking-tight text-slate-950">{leaderboardState.totalUsers}</p>
+            </div>
+          </div>
+
+          <div className="mt-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{t(locale, 'leaderboard.periodLabel')}</p>
+            <div className="mt-3 flex flex-wrap gap-2">
+              {leaderboardPeriodFilters.map((period) => (
+                <FilterPill
+                  key={period}
+                  active={leaderboardPeriod === period}
+                  label={t(locale, `leaderboard.periods.${period}`)}
+                  onClick={() => setLeaderboardPeriod(period)}
+                />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {leaderboardState.error ? (
+          <div className="rounded-[16px] bg-[#fff1f2] px-4 py-3 text-[13px] text-rose-700">{leaderboardState.error}</div>
+        ) : null}
+
+        {leaderboardState.loading ? (
+          <div className="rounded-[18px] bg-white px-4 py-5 text-[13px] text-slate-500 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+            {t(locale, 'common.loading')}
+          </div>
+        ) : visibleEntries.length === 0 ? (
+          <div className="rounded-[18px] bg-white px-4 py-5 text-[13px] text-slate-500 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+            {t(locale, 'leaderboard.empty')}
+          </div>
+        ) : (
+          <section className="space-y-3 rounded-[22px] bg-white px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+            <div className="flex items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{t(locale, 'leaderboard.rankings')}</p>
+                <h3 className="mt-2 text-[18px] font-semibold tracking-tight text-slate-900">{t(locale, 'leaderboard.topLearners')}</h3>
+              </div>
+              {leaderboardState.currentUserEntry ? (
+                <span className="rounded-full bg-[#eef2ff] px-3 py-1.5 text-[12px] font-semibold text-[#4f46e5]">
+                  {t(locale, 'leaderboard.currentRank', { rank: leaderboardState.currentUserEntry.rank ?? '-' })}
+                </span>
+              ) : null}
+            </div>
+
+            <div className="space-y-3">
+              {visibleEntries.map((entry) => (
+                <LeaderboardRow
+                  key={entry.id}
+                  entry={entry}
+                  locale={locale}
+                  isCurrentUser={entry.id === leaderboardState.currentUserEntry?.id}
+                />
+              ))}
+            </div>
+
+            {leaderboardState.currentUserEntry && !isCurrentUserVisible ? (
+              <div className="border-t border-slate-100 pt-4">
+                <p className="mb-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                  {t(locale, 'leaderboard.yourPosition')}
+                </p>
+                <LeaderboardRow entry={leaderboardState.currentUserEntry} locale={locale} isCurrentUser />
+              </div>
+            ) : null}
+          </section>
+        )}
+      </div>
+    );
+  }
+
+  function renderShop() {
+    return (
+      <div className="space-y-5">
+        <div>
+          <h2 className="text-[20px] font-semibold tracking-tight text-slate-900">{t(locale, 'shop.title')}</h2>
+          <p className="mt-1 text-[13px] text-slate-500">{t(locale, 'shop.subtitle')}</p>
+        </div>
+
+        <section className="overflow-hidden rounded-[24px] bg-[linear-gradient(135deg,#fff4ea_0%,#fffdf8_35%,#eef4ff_100%)] px-5 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#c45a00]">{t(locale, 'shop.eyebrow')}</p>
+          <div className="mt-3 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-[40rem]">
+              <h3 className="text-[26px] font-semibold tracking-tight text-slate-950">{t(locale, 'shop.heroTitle')}</h3>
+              <p className="mt-3 text-[14px] leading-7 text-slate-600">{t(locale, 'shop.heroCopy')}</p>
+            </div>
+            <div className="rounded-[20px] bg-white px-4 py-4 shadow-[0_10px_24px_rgba(15,23,42,0.05)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{t(locale, 'shop.featured')}</p>
+              <p className="mt-2 text-[24px] font-semibold tracking-tight text-slate-950">
+                {shopState.ownedSlugs.filter((slug) => slug.startsWith('exam-prep-')).length}
+              </p>
+              <p className="mt-1 text-[12px] text-slate-500">exam-prep products owned</p>
+            </div>
+          </div>
+        </section>
+
+        <section className="rounded-[22px] bg-white px-4 py-4 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+          <p className="text-[13px] leading-6 text-slate-600">
+            {shopState.checkoutMode === 'stripe-checkout'
+              ? t(locale, 'shop.stripeReady')
+              : canPurchaseFromShop
+                ? t(locale, 'shop.prototypeMode')
+                : t(locale, 'shop.catalogOnly')}
+          </p>
+        </section>
+
+        {shopState.notice ? (
+          <div className="rounded-[16px] bg-[#ecfdf5] px-4 py-3 text-[13px] text-emerald-700">{shopState.notice}</div>
+        ) : null}
+
+        {shopState.error ? (
+          <div className="rounded-[16px] bg-[#fff1f2] px-4 py-3 text-[13px] text-rose-700">{shopState.error}</div>
+        ) : null}
+
+        {shopState.loading ? (
+          <div className="rounded-[18px] bg-white px-4 py-5 text-[13px] text-slate-500 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+            {t(locale, 'common.loading')}
+          </div>
+        ) : shopState.sections.length === 0 ? (
+          <div className="rounded-[18px] bg-white px-4 py-5 text-[13px] text-slate-500 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+            {t(locale, 'shop.empty')}
+          </div>
+        ) : (
+          <div className="space-y-5">
+            {shopState.sections.map((section) => (
+              <section key={section.id} className="space-y-4">
+                <div className="flex items-end justify-between gap-4">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{section.id}</p>
+                    <h3 className="mt-2 text-[22px] font-semibold tracking-tight text-slate-950">
+                      {getLocalizedText(locale, section.title)}
+                    </h3>
+                    <p className="mt-2 text-[13px] leading-6 text-slate-500">{getLocalizedText(locale, section.description)}</p>
+                  </div>
+                  <span className="rounded-full bg-slate-100 px-3 py-1.5 text-[12px] font-semibold text-slate-600">
+                    {section.products.length}
+                  </span>
+                </div>
+
+                <div className="grid gap-4 xl:grid-cols-2">
+                  {section.products.map((product) => (
+                    <ShopProductCard
+                      key={product.slug}
+                      product={product}
+                      locale={locale}
+                      onUnlock={handleUnlockProduct}
+                      isUnlocking={shopState.purchasingSlug === product.slug}
+                      canPurchase={canPurchaseFromShop}
+                    />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+
+        <section className="space-y-4 rounded-[24px] bg-[linear-gradient(160deg,#ffffff_0%,#f8fafc_50%,#fff7ed_100%)] px-5 py-5 shadow-[0_18px_40px_rgba(15,23,42,0.08)]">
+          <div>
+            <h3 className="text-[22px] font-semibold tracking-tight text-slate-950">{t(locale, 'shop.studioTitle')}</h3>
+            <p className="mt-2 text-[13px] leading-6 text-slate-600">{t(locale, 'shop.studioSubtitle')}</p>
+          </div>
+
+          {examPrepState.error ? (
+            <div className="rounded-[16px] bg-[#fff1f2] px-4 py-3 text-[13px] text-rose-700">{examPrepState.error}</div>
+          ) : null}
+
+          {examPrepState.loading ? (
+            <div className="rounded-[18px] bg-white px-4 py-5 text-[13px] text-slate-500 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+              {t(locale, 'common.loading')}
+            </div>
+          ) : examPrepState.items.length === 0 ? (
+            <div className="rounded-[18px] bg-white px-4 py-5 text-[13px] text-slate-500 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+              {t(locale, 'shop.studioEmpty')}
+            </div>
+          ) : (
+            <div className="grid gap-5 xl:grid-cols-[minmax(320px,0.9fr)_minmax(0,1.2fr)]">
+              <div className="space-y-3">
+                {examPrepState.items.map((item) => (
+                  <ExamPrepPackCard
+                    key={item.productSlug}
+                    item={item}
+                    locale={locale}
+                    active={selectedExamPrepPack?.productSlug === item.productSlug}
+                    onSelect={() => setExamPrepState((current) => ({ ...current, selectedSlug: item.productSlug }))}
+                  />
+                ))}
+              </div>
+
+              {selectedExamPrepPack ? (
+                <div className="space-y-4 rounded-[22px] bg-white px-5 py-5 shadow-[0_10px_30px_rgba(15,23,42,0.05)]">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{selectedExamPrepPack.levelCode}</p>
+                    <h4 className="mt-2 text-[24px] font-semibold tracking-tight text-slate-950">
+                      {getLocalizedText(locale, selectedExamPrepPack.title)}
+                    </h4>
+                    <p className="mt-3 text-[14px] leading-7 text-slate-600">
+                      {getLocalizedText(locale, selectedExamPrepPack.overview)}
+                    </p>
+                  </div>
+
+                  <div className="rounded-[18px] bg-slate-50 px-4 py-4">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{t(locale, 'shop.focusAreas')}</p>
+                    <div className="mt-3 space-y-2">
+                      {(selectedExamPrepPack.focusAreas ?? []).map((item, index) => (
+                        <div key={`${selectedExamPrepPack.productSlug}-focus-${index}`} className="flex gap-3 text-[13px] leading-6 text-slate-600">
+                          <span className="mt-2 h-1.5 w-1.5 rounded-full bg-[#ff8b26]" />
+                          <span>{getLocalizedText(locale, item)}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {!selectedExamPrepPack.access ? (
+                    <div className="rounded-[18px] border border-dashed border-slate-200 bg-slate-50 px-4 py-5 text-[13px] leading-6 text-slate-600">
+                      {t(locale, 'shop.accessRequired')}
+                    </div>
+                  ) : (
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">{t(locale, 'shop.packModules')}</p>
+                        <span className="rounded-full bg-[#ecfdf5] px-3 py-1.5 text-[12px] font-semibold text-[#059669]">
+                          {t(locale, 'shop.studioOpen')}
+                        </span>
+                      </div>
+                      {selectedExamPrepPack.modules.map((module) => (
+                        <section key={module.id} className="space-y-3 rounded-[20px] bg-[#f8fafc] px-4 py-4">
+                          <h5 className="text-[18px] font-semibold tracking-tight text-slate-900">{getLocalizedText(locale, module.title)}</h5>
+                          {module.sections.map((section, index) => (
+                            <SectionBlock key={`${module.id}-${index}`} section={section} locale={locale} />
+                          ))}
+                        </section>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ) : null}
+            </div>
+          )}
+        </section>
+      </div>
+    );
+  }
+
   function renderProfile() {
     return (
       <div className="space-y-5">
@@ -2342,7 +3284,9 @@ export default function Page() {
     lessons: renderLessons(),
     practice: renderPractice(),
     culture: renderCulture(),
+    leaderboard: renderLeaderboard(),
     stats: renderStats(),
+    shop: renderShop(),
     profile: renderProfile(),
   }[activeTab];
 
@@ -2431,6 +3375,50 @@ export default function Page() {
               ))}
             </div>
           </nav>
+        </div>
+      </div>
+
+      <div className="mx-auto mt-5 max-w-[1440px] rounded-[28px] border border-white/70 bg-white/85 px-5 py-5 shadow-[0_18px_60px_rgba(15,23,42,0.08)] backdrop-blur-xl sm:px-6 lg:px-7">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Support and legal</p>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
+              Need help or a privacy answer? Contact us at{' '}
+              <a
+                href={`mailto:${SUPPORT_EMAIL}`}
+                className="font-semibold text-slate-900 underline decoration-slate-300 underline-offset-4"
+              >
+                {SUPPORT_EMAIL}
+              </a>
+              {' '}or use the tracked support form.
+            </p>
+          </div>
+
+          <div className="flex flex-wrap gap-3">
+            <a
+              href="/support"
+              className="inline-flex items-center gap-2 rounded-full bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition hover:bg-slate-800"
+            >
+              <LifeBuoy className="h-4 w-4" />
+              Contact support
+            </a>
+            {isAdminRole(user?.role) ? (
+              <a
+                href="/admin"
+                className="inline-flex items-center gap-2 rounded-full border border-[#ffd7b0] bg-[#fff4ea] px-4 py-2 text-sm font-semibold text-[#c45a00] transition hover:border-[#ffbf86] hover:text-[#9f4700]"
+              >
+                <Crown className="h-4 w-4" />
+                Open admin panel
+              </a>
+            ) : null}
+            <a
+              href="/privacy-policy"
+              className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-slate-300 hover:text-slate-950"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              Privacy Policy
+            </a>
+          </div>
         </div>
       </div>
 
