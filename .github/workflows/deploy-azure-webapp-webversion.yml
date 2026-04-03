@@ -40,21 +40,21 @@ jobs:
 
       - name: Build application
         run: npm run build
-        env:
-          REACT_ROUTER_HONO_SERVER_SKIP_LISTEN: 'true'
+
+      - name: Prune dev dependencies
+        run: npm prune --omit=dev
 
       - name: Prepare deployment package
         shell: bash
         run: |
           mkdir -p release
-          tar \
-            --exclude='./.git' \
-            --exclude='./.github' \
-            --exclude='./node_modules' \
-            --exclude='./build' \
-            --exclude='./test' \
-            --exclude='./release' \
-            -cf - . | (cd release && tar -xf -)
+          cp package.json release/
+          cp package-lock.json release/
+          cp -R build release/build
+          cp -R node_modules release/node_modules
+          if [ -d public ]; then
+            cp -R public release/public
+          fi
 
       - name: Azure login
         uses: azure/login@v3
@@ -77,9 +77,9 @@ jobs:
             --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
             --settings \
               AUTH_URL="https://${{ env.AZURE_WEBAPP_NAME }}.azurewebsites.net/api/auth" \
-              ENABLE_ORYX_BUILD="true" \
+              ENABLE_ORYX_BUILD="false" \
               HOST="0.0.0.0" \
-              SCM_DO_BUILD_DURING_DEPLOYMENT="true"
+              SCM_DO_BUILD_DURING_DEPLOYMENT="false"
 
       - name: Ensure Azure Web App is running
         shell: bash
@@ -98,7 +98,7 @@ jobs:
             if [ "$app_state" = "Running" ]; then
               exit 0
             fi
-            
+
             if [ "$app_state" = "QuotaExceeded" ]; then
               echo "Azure web app is in 'QuotaExceeded' state. The target App Service plan or subscription does not currently have enough quota to start this app." >&2
               echo "Resolve the quota issue in Azure Portal by scaling the plan, stopping or deleting other apps in the same App Service plan, or requesting a quota increase, then rerun deployment." >&2
@@ -138,30 +138,6 @@ jobs:
           az webapp restart \
             --name "${{ env.AZURE_WEBAPP_NAME }}" \
             --resource-group "${{ env.AZURE_RESOURCE_GROUP }}"
-          
-          for attempt in 1 2 3 4 5 6; do
-            app_state=$(az webapp show \
-              --name "${{ env.AZURE_WEBAPP_NAME }}" \
-              --resource-group "${{ env.AZURE_RESOURCE_GROUP }}" \
-              --query state \
-              --output tsv)
-
-            if [ "$app_state" = "Running" ]; then
-              exit 0
-            fi
-
-            if [ "$app_state" = "QuotaExceeded" ]; then
-              echo "Azure web app is in 'QuotaExceeded' state. The target App Service plan or subscription does not currently have enough quota to start this app." >&2
-              echo "Resolve the quota issue in Azure Portal by scaling the plan, stopping or deleting other apps in the same App Service plan, or requesting a quota increase, then rerun deployment." >&2
-              exit 1
-            fi
-
-            echo "Azure web app state is '$app_state' on attempt $attempt. Waiting for it to start..."
-            sleep 10
-          done
-
-          echo "Azure web app did not reach the Running state before deployment." >&2
-          exit 1
 
       - name: Verify live site is not placeholder
         shell: bash
