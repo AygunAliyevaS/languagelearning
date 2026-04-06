@@ -26,12 +26,12 @@ jobs:
 
 
 
-      - name: Clean install (remove lock and modules)
-        run: |
-          rm -rf node_modules package-lock.json
 
-      - name: Install dependencies (legacy peer deps)
-        run: npm install --legacy-peer-deps
+      - name: Clean install (remove node_modules only)
+        run: rm -rf node_modules
+
+      - name: Install dependencies (npm ci)
+        run: npm ci
 
       - name: Build project
         run: npm run build
