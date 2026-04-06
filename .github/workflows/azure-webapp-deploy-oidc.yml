@@ -6,7 +6,11 @@ name: Azure Web App Deploy (OIDC)
 on:
   push:
     branches:
-      - master
+      - webversion
+
+permissions:
+  id-token: write
+  contents: read
 
 jobs:
   build-and-deploy:
@@ -22,12 +26,12 @@ jobs:
 
 
 
-      - name: Clean install (remove lock and modules)
-        run: |
-          rm -rf node_modules package-lock.json
 
-      - name: Install dependencies (legacy peer deps)
-        run: npm install --legacy-peer-deps
+      - name: Clean install (remove node_modules only)
+        run: rm -rf node_modules
+
+      - name: Install dependencies (npm ci)
+        run: npm ci
 
       - name: Build project
         run: npm run build
@@ -35,10 +39,8 @@ jobs:
       - name: 'Login to Azure using OIDC'
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
+          creds: >-
+            {"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
