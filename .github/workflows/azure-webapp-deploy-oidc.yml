@@ -30,8 +30,8 @@ jobs:
       - name: Clean install (remove node_modules only)
         run: rm -rf node_modules
 
-      - name: Install dependencies (npm ci)
-        run: npm ci
+      - name: Install dependencies (legacy peer deps)
+        run: npm install --legacy-peer-deps
 
       - name: Build project
         run: npm run build
