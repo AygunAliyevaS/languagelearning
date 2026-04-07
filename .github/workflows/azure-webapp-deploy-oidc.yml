@@ -12,6 +12,13 @@ permissions:
   id-token: write
   contents: read
 
+env:
+  NODE_VERSION: '22.x'
+  AZURE_WEBAPP_NAME: 'azedili'
+  AZURE_RESOURCE_GROUP: 'azdili'
+  AZURE_TENANT_ID: 'f71cfc55-c062-43f2-be63-98cb4530c448'
+  AZURE_CLIENT_ID: '5d2f25d0-ecc7-4e52-8db6-a5c6380718ae'
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -22,13 +29,8 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '22.x'
-
-
-
-
-      - name: Clean install (remove node_modules only)
-        run: rm -rf node_modules
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
 
       - name: Install dependencies (legacy peer deps)
         run: npm install --legacy-peer-deps
@@ -36,14 +38,19 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: 'Login to Azure using OIDC'
-        uses: azure/login@v2
+      - name: Login to Azure using OIDC
+        uses: azure/login@v3
         with:
-          creds: >-
-            {"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_WEBVERSION_SUBSCRIPTION_ID }}
 
-      - name: 'Deploy to Azure Web App'
+      - name: Preflight check - App exists
+        run: |
+          az webapp show --name "${{ env.AZURE_WEBAPP_NAME }}" --resource-group "${{ env.AZURE_RESOURCE_GROUP }}"
+
+      - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          app-name: ${{ env.AZURE_WEBAPP_NAME }}
           package: .
