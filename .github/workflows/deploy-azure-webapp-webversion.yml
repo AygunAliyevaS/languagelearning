@@ -7,10 +7,12 @@ on:
 
 env:
   NODE_VERSION: '22.12.0'
-  AZURE_WEBAPP_NAME: 'azeridili'
+  AZURE_WEBAPP_NAME: 'azedili'
   AZURE_RESOURCE_GROUP: 'azdili'
   AZURE_NODE_RUNTIME: 'NODE|22-lts'
   AZURE_STARTUP_COMMAND: 'node node_modules/@react-router/serve/dist/cli.js build/server/index.js'
+  AZURE_TENANT_ID: 'f71cfc55-c062-43f2-be63-98cb4530c448'
+  AZURE_CLIENT_ID: '5d2f25d0-ecc7-4e52-8db6-a5c6380718ae'
 
 jobs:
   build-and-deploy:
@@ -32,8 +34,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install dependencies
-        run: npm ci
+      - name: Install dependencies (legacy peer deps)
+        run: npm install --legacy-peer-deps
 
       - name: Typecheck application
         run: npm run typecheck
@@ -57,11 +59,11 @@ jobs:
           fi
           (cd release && zip -r ../release.zip .)
 
-      - name: Azure login
+      - name: Azure login (OIDC)
         uses: azure/login@v3
         with:
-          client-id: ${{ secrets.AZURE_WEBVERSION_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_WEBVERSION_TENANT_ID }}
+          client-id: ${{ env.AZURE_CLIENT_ID }}
+          tenant-id: ${{ env.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_WEBVERSION_SUBSCRIPTION_ID }}
 
       - name: Configure Azure Web App runtime
