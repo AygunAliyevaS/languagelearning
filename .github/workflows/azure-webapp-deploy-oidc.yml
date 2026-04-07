@@ -1,7 +1,7 @@
-# Azure Web App Deployment Workflow (OIDC)
-# This workflow builds and deploys the app to Azure Web App using Azure Service Principal credentials (OIDC) on push to master.
+# Azure Web App deployment (client secret auth)
+# Runs on push to webversion; builds and deploys the app.
 
-name: Azure Web App Deploy (OIDC)
+name: Azure Web App Deploy (Client Secret)
 
 on:
   push:
@@ -9,19 +9,15 @@ on:
       - webversion
 
 permissions:
-  id-token: write
   contents: read
 
 env:
   NODE_VERSION: '22.x'
-  AZURE_WEBAPP_NAME: 'azedili'
-  AZURE_RESOURCE_GROUP: 'azdili'
-  AZURE_TENANT_ID: 'f71cfc55-c062-43f2-be63-98cb4530c448'
-  AZURE_CLIENT_ID: '5d2f25d0-ecc7-4e52-8db6-a5c6380718ae'
 
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -38,19 +34,16 @@ jobs:
       - name: Build project
         run: npm run build
 
-      - name: Login to Azure using OIDC
+      - name: Azure login (client secret)
         uses: azure/login@v3
         with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_WEBVERSION_SUBSCRIPTION_ID }}
-
-      - name: Preflight check - App exists
-        run: |
-          az webapp show --name "${{ env.AZURE_WEBAPP_NAME }}" --resource-group "${{ env.AZURE_RESOURCE_GROUP }}"
+          client-id: ${{ secrets.AZURE_WEBAPP_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_WEBAPP_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_WEBAPP_SUBSCRIPTION_ID }}
+          client-secret: ${{ secrets.AZURE_WEBAPP_CLIENT_SECRET }}
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
+          app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           package: .
