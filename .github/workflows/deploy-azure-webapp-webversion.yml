@@ -7,12 +7,10 @@ on:
 
 env:
   NODE_VERSION: '22.12.0'
-  AZURE_WEBAPP_NAME: 'azedili'
+  AZURE_WEBAPP_NAME: 'azeridili'
   AZURE_RESOURCE_GROUP: 'azdili'
   AZURE_NODE_RUNTIME: 'NODE|22-lts'
   AZURE_STARTUP_COMMAND: 'node node_modules/@react-router/serve/dist/cli.js build/server/index.js'
-  AZURE_TENANT_ID: 'f71cfc55-c062-43f2-be63-98cb4530c448'
-  AZURE_CLIENT_ID: '5d2f25d0-ecc7-4e52-8db6-a5c6380718ae'
 
 jobs:
   build-and-deploy:
@@ -34,8 +32,8 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: npm
 
-      - name: Install dependencies (legacy peer deps)
-        run: npm install --legacy-peer-deps
+      - name: Install dependencies
+        run: npm ci
 
       - name: Typecheck application
         run: npm run typecheck
@@ -43,27 +41,23 @@ jobs:
       - name: Build application
         run: npm run build
 
-      - name: Prune dev dependencies
-        run: npm prune --omit=dev
-
-      - name: Prepare deployment package
+      - name: Prepare deployment package (prod install)
         shell: bash
         run: |
           mkdir -p release
-          cp package.json release/
-          cp package-lock.json release/
+          cp package.json package-lock.json release/
           cp -R build release/build
-          cp -R node_modules release/node_modules
           if [ -d public ]; then
             cp -R public release/public
           fi
+          (cd release && npm ci --omit=dev --legacy-peer-deps)
           (cd release && zip -r ../release.zip .)
 
-      - name: Azure login (OIDC)
+      - name: Azure login
         uses: azure/login@v3
         with:
-          client-id: ${{ env.AZURE_CLIENT_ID }}
-          tenant-id: ${{ env.AZURE_TENANT_ID }}
+          client-id: ${{ secrets.AZURE_WEBVERSION_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_WEBVERSION_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_WEBVERSION_SUBSCRIPTION_ID }}
 
       - name: Configure Azure Web App runtime
