@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 env:
-  NODE_VERSION: '22.x'
+  NODE_VERSION: '20.x' # Azure App Service supports Node 20; 22 can fail to boot
 
 jobs:
   build-and-deploy:
@@ -37,13 +37,17 @@ jobs:
       - name: Azure login (client secret)
         uses: azure/login@v3
         with:
-          client-id: ${{ secrets.AZURE_WEBAPP_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_WEBAPP_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_WEBAPP_SUBSCRIPTION_ID }}
-          client-secret: ${{ secrets.AZURE_WEBAPP_CLIENT_SECRET }}
+          creds: |
+            {
+              "clientId": "${{ secrets.AZURE_WEBAPP_CLIENT_ID }}",
+              "clientSecret": "${{ secrets.AZURE_WEBAPP_CLIENT_SECRET }}",
+              "tenantId": "${{ secrets.AZURE_WEBAPP_TENANT_ID }}",
+              "subscriptionId": "${{ secrets.AZURE_WEBAPP_SUBSCRIPTION_ID }}"
+            }
 
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
+          startup-command: node node_modules/@react-router/serve/dist/cli.js build/server/index.js
           package: .
