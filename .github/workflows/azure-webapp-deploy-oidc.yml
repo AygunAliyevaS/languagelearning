@@ -34,6 +34,9 @@ jobs:
       - name: Build project
         run: npm run build
 
+      - name: Package build artifacts (include node_modules to avoid runtime install)
+        run: zip -r app.zip build node_modules package.json package-lock.json
+
       - name: Azure login (client secret)
         uses: azure/login@v3
         with:
@@ -45,9 +48,22 @@ jobs:
               "subscriptionId": "${{ secrets.AZURE_WEBAPP_SUBSCRIPTION_ID }}"
             }
 
+      - name: Configure app settings (timeout + disable Kudu build)
+        uses: azure/CLI@v2
+        with:
+          inlineScript: |
+            az webapp config appsettings delete \
+              --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.AZURE_WEBAPP_RESOURCE_GROUP }}" \
+              --setting-names PORT WEBSITES_PORT || true
+            az webapp config appsettings set \
+              --name "${{ secrets.AZURE_WEBAPP_NAME }}" \
+              --resource-group "${{ secrets.AZURE_WEBAPP_RESOURCE_GROUP }}" \
+              --settings WEBSITES_CONTAINER_START_TIME_LIMIT=1800 SCM_DO_BUILD_DURING_DEPLOYMENT=false
+
       - name: Deploy to Azure Web App
         uses: azure/webapps-deploy@v3
         with:
           app-name: ${{ secrets.AZURE_WEBAPP_NAME }}
           startup-command: node node_modules/@react-router/serve/dist/cli.js build/server/index.js
-          package: .
+          package: app.zip
