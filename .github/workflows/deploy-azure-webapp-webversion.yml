@@ -3,7 +3,7 @@ name: Deploy Azure Web App Webversion
 on:
   push:
     branches:
-      - webversion
+      - temp
 
 env:
   NODE_VERSION: '22.12.0'
@@ -20,7 +20,7 @@ jobs:
       contents: read
       id-token: write
 
-    if: github.ref == 'refs/heads/webversion'
+    if: github.ref == 'refs/heads/temp'
 
     steps:
       - name: Checkout repository
